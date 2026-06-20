@@ -14,7 +14,7 @@
 
         html, body {
             height: 100%;
-            overflow: hidden;
+            overflow: auto;
         }
 
         body {
@@ -28,7 +28,7 @@
 
         /* ==================== FULL-SCREEN GRID SHELL ==================== */
         .dashboard {
-            height: 100vh;
+            min-height: 100vh;
             width: 100vw;
             display: grid;
             grid-template-rows: auto 1fr;
@@ -101,14 +101,13 @@
             display: grid;
             grid-template-columns: 1fr minmax(280px, 22vw);
             gap: clamp(12px, 1.2vw, 20px);
-            min-height: 0;
+            align-items: start;
         }
 
         /* ==================== FLOORPLAN CONTAINER ==================== */
         .floorplan-container {
             position: relative;
             width: 100%;
-            height: 100%;
             border-radius: 18px;
             overflow: hidden;
             background: #0a0e17;
@@ -116,7 +115,7 @@
 
         .floorplan-container svg {
             width: 100%;
-            height: 100%;
+            height: auto;
             display: block;
             opacity: 0.72;
             transition: opacity 0.3s;
@@ -266,10 +265,12 @@
 
         /* ==================== SIDEBAR ==================== */
         .sidebar {
-            display: grid;
-            grid-template-rows: auto 1fr auto;
+            display: flex;
+            flex-direction: column;
             gap: clamp(10px, 1vw, 16px);
-            min-height: 0;
+            position: sticky;
+            top: clamp(14px, 1.4vw, 26px);
+            align-self: start;
         }
 
         .panel {
@@ -303,11 +304,9 @@
         }
 
         .sensor-list {
-            overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 8px;
-            flex: 1;
         }
 
         .sensor-list::-webkit-scrollbar {
