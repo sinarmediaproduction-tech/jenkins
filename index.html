@@ -112,9 +112,81 @@
             overflow: hidden;
             background: #0a0e17;
             aspect-ratio: 28233.56 / 40606.29;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
+        /* ==================== GRID BACKGROUND ==================== */
+        .grid-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-image:
+                /* Grid utama 10% */
+                linear-gradient(rgba(0, 212, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.08) 1px, transparent 1px),
+                /* Sub-grid 2% */
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size:
+                10% 10%,
+                10% 10%,
+                2% 2%,
+                2% 2%;
+            background-position:
+                0 0, 0 0,
+                0 0, 0 0;
+            pointer-events: none;
+        }
+
+        /* Label koordinat di grid */
+        .grid-coords {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(8px, 0.6vw, 11px);
+            color: rgba(0, 212, 255, 0.25);
+        }
+
+        .grid-coords .x-label {
+            position: absolute;
+            transform: translateX(-50%);
+            top: 4px;
+        }
+
+        .grid-coords .y-label {
+            position: absolute;
+            transform: translateY(-50%);
+            left: 4px;
+        }
+
+        .grid-coords .x-label:nth-child(1) { left: 5%; }
+        .grid-coords .x-label:nth-child(2) { left: 15%; }
+        .grid-coords .x-label:nth-child(3) { left: 25%; }
+        .grid-coords .x-label:nth-child(4) { left: 35%; }
+        .grid-coords .x-label:nth-child(5) { left: 45%; }
+        .grid-coords .x-label:nth-child(6) { left: 55%; }
+        .grid-coords .x-label:nth-child(7) { left: 65%; }
+        .grid-coords .x-label:nth-child(8) { left: 75%; }
+        .grid-coords .x-label:nth-child(9) { left: 85%; }
+        .grid-coords .x-label:nth-child(10) { left: 95%; }
+
+        .grid-coords .y-label:nth-child(11) { top: 5%; }
+        .grid-coords .y-label:nth-child(12) { top: 15%; }
+        .grid-coords .y-label:nth-child(13) { top: 25%; }
+        .grid-coords .y-label:nth-child(14) { top: 35%; }
+        .grid-coords .y-label:nth-child(15) { top: 45%; }
+        .grid-coords .y-label:nth-child(16) { top: 55%; }
+        .grid-coords .y-label:nth-child(17) { top: 65%; }
+        .grid-coords .y-label:nth-child(18) { top: 75%; }
+        .grid-coords .y-label:nth-child(19) { top: 85%; }
+        .grid-coords .y-label:nth-child(20) { top: 95%; }
+
+        /* ==================== SVG OVERLAY ==================== */
         .floorplan-container svg {
+            position: relative;
+            z-index: 2;
             width: 100%;
             height: 100%;
             display: block;
@@ -129,6 +201,7 @@
         /* ==================== SENSOR DOT ==================== */
         .sensor-dot {
             position: absolute;
+            z-index: 10;
             width: clamp(18px, 1.6vw, 28px);
             height: clamp(18px, 1.6vw, 28px);
             border-radius: 50%;
@@ -137,7 +210,6 @@
             transform: translate(-50%, -50%);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             cursor: pointer;
-            z-index: 10;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
         }
 
@@ -172,6 +244,21 @@
         .sensor-dot:hover .sensor-tooltip {
             opacity: 1;
             bottom: calc(100% + 16px);
+        }
+
+        /* Koordinat di samping sensor (debug) */
+        .sensor-coord {
+            position: absolute;
+            z-index: 9;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(7px, 0.5vw, 9px);
+            color: rgba(255, 255, 255, 0.15);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.3);
+            padding: 1px 4px;
+            border-radius: 3px;
+            white-space: nowrap;
         }
 
         /* ==================== STATUS SENSOR ==================== */
@@ -329,6 +416,12 @@
             color: #ff6677;
         }
 
+        .sensor-row-coord {
+            font-size: clamp(8px, 0.6vw, 10px);
+            color: #44557a;
+            font-family: 'Courier New', monospace;
+        }
+
         /* --- Legend panel --- */
         .legend {
             display: flex;
@@ -428,6 +521,39 @@
                 max-height: 200px;
             }
         }
+
+        /* ==================== TOGGLE GRID ==================== */
+        .toggle-grid {
+            position: absolute;
+            z-index: 20;
+            top: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #8899bb;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: clamp(10px, 0.7vw, 12px);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .toggle-grid:hover {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+        }
+
+        .toggle-grid .icon {
+            margin-right: 6px;
+        }
+
+        .grid-hidden .grid-bg,
+        .grid-hidden .grid-coords {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -450,7 +576,42 @@
 
             <!-- FLOORPLAN -->
             <div class="floorplan-container" id="floorplan">
-                <!-- Denah rumah SVG (inline) -->
+
+                <!-- ======== GRID BACKGROUND ======== -->
+                <div class="grid-bg"></div>
+
+                <!-- ======== GRID COORDINATES LABELS ======== -->
+                <div class="grid-coords">
+                    <!-- X labels (top) -->
+                    <span class="x-label">0%</span>
+                    <span class="x-label">10%</span>
+                    <span class="x-label">20%</span>
+                    <span class="x-label">30%</span>
+                    <span class="x-label">40%</span>
+                    <span class="x-label">50%</span>
+                    <span class="x-label">60%</span>
+                    <span class="x-label">70%</span>
+                    <span class="x-label">80%</span>
+                    <span class="x-label">90%</span>
+                    <!-- Y labels (left) -->
+                    <span class="y-label">0%</span>
+                    <span class="y-label">10%</span>
+                    <span class="y-label">20%</span>
+                    <span class="y-label">30%</span>
+                    <span class="y-label">40%</span>
+                    <span class="y-label">50%</span>
+                    <span class="y-label">60%</span>
+                    <span class="y-label">70%</span>
+                    <span class="y-label">80%</span>
+                    <span class="y-label">90%</span>
+                </div>
+
+                <!-- ======== TOGGLE GRID BUTTON ======== -->
+                <button class="toggle-grid" id="toggleGrid" onclick="toggleGrid()">
+                    <span class="icon">▦</span> Sembunyikan Grid
+                </button>
+
+                <!-- ======== SVG DENAH ======== -->
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28233.56 40606.29" width="100%" height="100%" preserveAspectRatio="xMidYMin meet" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd;">
   <defs>
     <style>
@@ -464,7 +625,6 @@
       .dash-white { fill: none; stroke: #2a4a6a; stroke-width: 130.14; }
     </style>
   </defs>
-  <!-- Outer Border removed for seamless integration -->
   <!-- Outer wall -->
   <polygon class="bg" points="13285.93,3318.53 4596.09,4343.21 4596.09,14309.71 5386.56,14309.71 5386.56,25974.11 11104.55,25974.11 11104.55,37287.75 23248.82,37287.75 23248.82,17744.62 13285.93,17744.62 "/>
   <!-- Top Area Rooms -->
@@ -556,95 +716,113 @@
 
                 <!-- == LANTAI 1 == -->
                 <!-- Dapur -->
-                <div class="sensor-dot idle" id="sensor-dapur" style="left: 13.5%; top: 39.5%;" data-room="Dapur">
+                <div class="sensor-dot idle" id="sensor-dapur" style="left: 13.5%; top: 39.5%;" data-room="Dapur" data-coord="13.5%, 39.5%">
                     <span class="sensor-tooltip">Dapur</span>
+                    <span class="sensor-coord">13.5%, 39.5%</span>
                 </div>
 
                 <!-- Kamar Kiri 1 -->
-                <div class="sensor-dot idle" id="sensor-kamar-kiri1" style="left: 9.8%; top: 49%;" data-room="Kamar Kiri 1">
+                <div class="sensor-dot idle" id="sensor-kamar-kiri1" style="left: 9.8%; top: 49%;" data-room="Kamar Kiri 1" data-coord="9.8%, 49%">
                     <span class="sensor-tooltip">Kamar 1</span>
+                    <span class="sensor-coord">9.8%, 49%</span>
                 </div>
 
                 <!-- Kamar Kiri 2 -->
-                <div class="sensor-dot idle" id="sensor-kamar-kiri2" style="left: 10.2%; top: 56%;" data-room="Kamar Kiri 2">
+                <div class="sensor-dot idle" id="sensor-kamar-kiri2" style="left: 10.2%; top: 56%;" data-room="Kamar Kiri 2" data-coord="10.2%, 56%">
                     <span class="sensor-tooltip">Kamar 2</span>
+                    <span class="sensor-coord">10.2%, 56%</span>
                 </div>
 
                 <!-- Kitchen -->
-                <div class="sensor-dot idle" id="sensor-kitchen" style="left: 16.8%; top: 56.5%;" data-room="Kitchen">
+                <div class="sensor-dot idle" id="sensor-kitchen" style="left: 16.8%; top: 56.5%;" data-room="Kitchen" data-coord="16.8%, 56.5%">
                     <span class="sensor-tooltip">Kitchen</span>
+                    <span class="sensor-coord">16.8%, 56.5%</span>
                 </div>
 
                 <!-- Ruang Tengah -->
-                <div class="sensor-dot idle" id="sensor-ruang" style="left: 20.5%; top: 49%;" data-room="Ruang">
+                <div class="sensor-dot idle" id="sensor-ruang" style="left: 20.5%; top: 49%;" data-room="Ruang" data-coord="20.5%, 49%">
                     <span class="sensor-tooltip">Ruang</span>
+                    <span class="sensor-coord">20.5%, 49%</span>
                 </div>
 
                 <!-- Gudang -->
-                <div class="sensor-dot idle" id="sensor-gudang" style="left: 30.5%; top: 49%;" data-room="Gudang">
+                <div class="sensor-dot idle" id="sensor-gudang" style="left: 30.5%; top: 49%;" data-room="Gudang" data-coord="30.5%, 49%">
                     <span class="sensor-tooltip">Gudang</span>
+                    <span class="sensor-coord">30.5%, 49%</span>
                 </div>
 
                 <!-- Family Room -->
-                <div class="sensor-dot idle" id="sensor-family" style="left: 25.5%; top: 58%;" data-room="Family">
+                <div class="sensor-dot idle" id="sensor-family" style="left: 25.5%; top: 58%;" data-room="Family" data-coord="25.5%, 58%">
                     <span class="sensor-tooltip">Family</span>
+                    <span class="sensor-coord">25.5%, 58%</span>
                 </div>
 
                 <!-- Kamar Tengah -->
-                <div class="sensor-dot idle" id="sensor-kamar-tengah" style="left: 30.5%; top: 56.5%;" data-room="Kamar Tengah">
+                <div class="sensor-dot idle" id="sensor-kamar-tengah" style="left: 30.5%; top: 56.5%;" data-room="Kamar Tengah" data-coord="30.5%, 56.5%">
                     <span class="sensor-tooltip">Kamar 3</span>
+                    <span class="sensor-coord">30.5%, 56.5%</span>
                 </div>
 
                 <!-- Kamar Atas -->
-                <div class="sensor-dot idle" id="sensor-kamar-atas" style="left: 38%; top: 49%;" data-room="Kamar Atas">
+                <div class="sensor-dot idle" id="sensor-kamar-atas" style="left: 38%; top: 49%;" data-room="Kamar Atas" data-coord="38%, 49%">
                     <span class="sensor-tooltip">Kamar 4</span>
+                    <span class="sensor-coord">38%, 49%</span>
                 </div>
 
                 <!-- == LANTAI 2 (Garasi/Teras) == -->
                 <!-- Garasi -->
-                <div class="sensor-dot idle" id="sensor-garasi" style="left: 43%; top: 85%;" data-room="Garasi">
+                <div class="sensor-dot idle" id="sensor-garasi" style="left: 43%; top: 85%;" data-room="Garasi" data-coord="43%, 85%">
                     <span class="sensor-tooltip">Garasi</span>
+                    <span class="sensor-coord">43%, 85%</span>
                 </div>
 
                 <!-- Teras -->
-                <div class="sensor-dot idle" id="sensor-teras" style="left: 27%; top: 82%;" data-room="Teras">
+                <div class="sensor-dot idle" id="sensor-teras" style="left: 27%; top: 82%;" data-room="Teras" data-coord="27%, 82%">
                     <span class="sensor-tooltip">Teras</span>
+                    <span class="sensor-coord">27%, 82%</span>
                 </div>
 
                 <!-- Kamar Atas Garasi -->
-                <div class="sensor-dot idle" id="sensor-kamar-atas2" style="left: 32%; top: 73%;" data-room="Kamar Atas 2">
+                <div class="sensor-dot idle" id="sensor-kamar-atas2" style="left: 32%; top: 73%;" data-room="Kamar Atas 2" data-coord="32%, 73%">
                     <span class="sensor-tooltip">Kamar 5</span>
+                    <span class="sensor-coord">32%, 73%</span>
                 </div>
 
                 <!-- == AREA EKSTERIOR == -->
                 <!-- Aviary -->
-                <div class="sensor-dot idle" id="sensor-aviary" style="left: 16.5%; top: 29%;" data-room="Aviary">
+                <div class="sensor-dot idle" id="sensor-aviary" style="left: 16.5%; top: 29%;" data-room="Aviary" data-coord="16.5%, 29%">
                     <span class="sensor-tooltip">Aviary</span>
+                    <span class="sensor-coord">16.5%, 29%</span>
                 </div>
 
                 <!-- Work -->
-                <div class="sensor-dot idle" id="sensor-work" style="left: 15.5%; top: 25%;" data-room="Work">
+                <div class="sensor-dot idle" id="sensor-work" style="left: 15.5%; top: 25%;" data-room="Work" data-coord="15.5%, 25%">
                     <span class="sensor-tooltip">Work</span>
+                    <span class="sensor-coord">15.5%, 25%</span>
                 </div>
 
                 <!-- Apotek -->
-                <div class="sensor-dot idle" id="sensor-apotek" style="left: 11%; top: 22%;" data-room="Apotek">
+                <div class="sensor-dot idle" id="sensor-apotek" style="left: 11%; top: 22%;" data-room="Apotek" data-coord="11%, 22%">
                     <span class="sensor-tooltip">Apotek</span>
+                    <span class="sensor-coord">11%, 22%</span>
                 </div>
 
                 <!-- Ekpansi Green -->
-                <div class="sensor-dot idle" id="sensor-ekpansi" style="left: 10%; top: 16%;" data-room="Ekpansi Green">
+                <div class="sensor-dot idle" id="sensor-ekpansi" style="left: 10%; top: 16%;" data-room="Ekpansi Green" data-coord="10%, 16%">
                     <span class="sensor-tooltip">Ekpansi Green</span>
+                    <span class="sensor-coord">10%, 16%</span>
                 </div>
 
                 <!-- Tempat -->
-                <div class="sensor-dot idle" id="sensor-tempat" style="left: 38.5%; top: 52.5%;" data-room="Tempat">
+                <div class="sensor-dot idle" id="sensor-tempat" style="left: 38.5%; top: 52.5%;" data-room="Tempat" data-coord="38.5%, 52.5%">
                     <span class="sensor-tooltip">Tempat</span>
+                    <span class="sensor-coord">38.5%, 52.5%</span>
                 </div>
 
                 <!-- Laundry (dari teks) -->
-                <div class="sensor-dot idle" id="sensor-laundry" style="left: 20%; top: 40%;" data-room="Laundry">
+                <div class="sensor-dot idle" id="sensor-laundry" style="left: 20%; top: 40%;" data-room="Laundry" data-coord="20%, 40%">
                     <span class="sensor-tooltip">Laundry</span>
+                    <span class="sensor-coord">20%, 40%</span>
                 </div>
             </div>
 
@@ -717,12 +895,16 @@
         // ================================================================
         const sensorListEl = document.getElementById('sensorList');
         sensors.forEach(s => {
+            const dot = document.getElementById(s.id);
+            const coord = dot ? dot.dataset.coord || '-' : '-';
+
             const row = document.createElement('div');
             row.className = 'sensor-row';
             row.id = s.id + '-row';
             row.innerHTML = `
                 <span class="sensor-row-dot"></span>
                 <span class="sensor-row-name">${s.name}</span>
+                <span class="sensor-row-coord">${coord}</span>
                 <span class="sensor-row-status">Aman</span>
             `;
             sensorListEl.appendChild(row);
@@ -794,7 +976,26 @@
         }
 
         // ================================================================
-        // DEMO: SIMULASI SENSOR AKTIF RANDOM (untuk testing tanpa ESP32)
+        // TOGGLE GRID
+        // ================================================================
+        let gridVisible = true;
+
+        function toggleGrid() {
+            const container = document.getElementById('floorplan');
+            const btn = document.getElementById('toggleGrid');
+            if (gridVisible) {
+                container.classList.add('grid-hidden');
+                btn.innerHTML = '<span class="icon">▦</span> Tampilkan Grid';
+                gridVisible = false;
+            } else {
+                container.classList.remove('grid-hidden');
+                btn.innerHTML = '<span class="icon">▦</span> Sembunyikan Grid';
+                gridVisible = true;
+            }
+        }
+
+        // ================================================================
+        // DEMO: SIMULASI SENSOR AKTIF RANDOM
         // ================================================================
         let demoInterval = null;
 
@@ -803,7 +1004,6 @@
             sensors.forEach(s => updateSensor(s.id, false));
 
             demoInterval = setInterval(() => {
-                // Pilih 1-3 sensor acak untuk diaktifkan
                 const numActive = Math.floor(Math.random() * 3) + 1;
                 const activeIds = [];
                 const shuffled = [...sensors].sort(() => Math.random() - 0.5);
@@ -812,10 +1012,7 @@
                     activeIds.push(shuffled[i].id);
                 }
 
-                // Reset semua ke idle
                 sensors.forEach(s => updateSensor(s.id, false));
-
-                // Aktifkan yang terpilih
                 activeIds.forEach(id => updateSensor(id, true));
 
             }, 4000);
@@ -856,14 +1053,14 @@
         */
 
         // ================================================================
-        // MULAI DENGAN DEMO (jika tidak ada WebSocket)
+        // MULAI DENGAN DEMO
         // ================================================================
         console.log('🏠 Dashboard Home Monitoring siap.');
         addLog('Sistem', 'Mode Demo - simulasi sensor acak', false);
         startDemo();
 
         // ================================================================
-        // FUNGSI MANUAL UNTUK TESTING (bisa dipanggil dari console)
+        // FUNGSI MANUAL UNTUK TESTING
         // ================================================================
         window.testSensor = function(sensorId, isActive) {
             updateSensor(sensorId, isActive);
@@ -882,9 +1079,22 @@
             return result;
         };
 
+        window.showGrid = function() {
+            document.getElementById('floorplan').classList.remove('grid-hidden');
+            document.getElementById('toggleGrid').innerHTML = '<span class="icon">▦</span> Sembunyikan Grid';
+            gridVisible = true;
+        };
+
+        window.hideGrid = function() {
+            document.getElementById('floorplan').classList.add('grid-hidden');
+            document.getElementById('toggleGrid').innerHTML = '<span class="icon">▦</span> Tampilkan Grid';
+            gridVisible = false;
+        };
+
         console.log('💡 Gunakan testSensor("sensor-dapur", true) untuk menguji sensor');
         console.log('💡 testAll(true) untuk mengaktifkan semua, testAll(false) untuk menonaktifkan semua');
         console.log('💡 getSensorStatus() untuk melihat status semua sensor');
+        console.log('💡 showGrid() / hideGrid() untuk toggle grid');
     </script>
 
 </body>
