@@ -601,7 +601,7 @@
                 <div class="panel log-panel">
                     <div class="panel-title">Aktivitas Terakhir</div>
                     <div class="log-area" id="logArea">
-                        <span id="lastEvent">Menunggu...</span>
+                        <span id="lastEvent">Menunggu koneksi ESP32...</span>
                     </div>
                 </div>
 
@@ -611,57 +611,17 @@
 
     <script>
         // ================================================================
-        // 1. DATA SENSOR
-        //    Sesuaikan koordinat (x, y dalam %) dengan posisi ruangan di denah
+        // JAM REAL-TIME DI HEADER
         // ================================================================
-        const sensors = [
-            { id: 'sensor-rtamu', name: 'Ruang Tamu', x: 22, y: 35, status: 'idle' },
-            { id: 'sensor-dapur', name: 'Dapur', x: 75, y: 58, status: 'idle' },
-            { id: 'sensor-ktidur', name: 'Kamar Tidur', x: 28, y: 72, status: 'idle' },
-            { id: 'sensor-kmandi', name: 'Kamar Mandi', x: 55, y: 78, status: 'idle' },
-            { id: 'sensor-garasi', name: 'Garasi', x: 82, y: 20, status: 'idle' },
-            { id: 'sensor-tblkng', name: 'Taman Belakang', x: 50, y: 10, status: 'idle' },
-        ];
+        function updateClock() {
+            document.getElementById('clockTime').textContent = new Date().toLocaleTimeString('id-ID');
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
 
         // ================================================================
-        // 2. BUAT ELEMEN SENSOR DI ATAS DENAH + DI DAFTAR SAMPING
-        // ================================================================
-        const container = document.getElementById('floorplan');
-        const sensorList = document.getElementById('sensorList');
-
-        sensors.forEach(sensor => {
-            // --- Titik sensor di denah ---
-            const dot = document.createElement('div');
-            dot.id = sensor.id;
-            dot.className = `sensor-dot idle`;
-            dot.style.left = sensor.x + '%';
-            dot.style.top = sensor.y + '%';
-            dot.title = sensor.name;
-            container.appendChild(dot);
-
-            // --- Label nama ruangan di denah ---
-            const label = document.createElement('div');
-            label.className = 'sensor-label';
-            label.id = sensor.id + '-label';
-            label.textContent = sensor.name;
-            label.style.left = sensor.x + '%';
-            label.style.top = (sensor.y + 4.5) + '%';
-            container.appendChild(label);
-
-            // --- Baris di panel daftar sensor ---
-            const row = document.createElement('div');
-            row.className = 'sensor-row';
-            row.id = sensor.id + '-row';
-            row.innerHTML = `
-                <span class="sensor-row-dot"></span>
-                <span class="sensor-row-name">${sensor.name}</span>
-                <span class="sensor-row-status">Aman</span>
-            `;
-            sensorList.appendChild(row);
-        });
-
-        // ================================================================
-        // 3. FUNGSI UPDATE SENSOR
+        // FUNGSI UPDATE SENSOR — dipanggil dari WebSocket ESP32
+        // Contoh payload: { "sensorId": "sensor-rtamu", "motion": true }
         // ================================================================
         function updateSensor(sensorId, isActive) {
             const dot = document.getElementById(sensorId);
@@ -670,7 +630,6 @@
             if (!dot) return;
 
             dot.classList.remove('idle', 'active');
-
             if (isActive) {
                 dot.classList.add('active');
                 if (label) label.classList.add('active-label');
@@ -689,59 +648,22 @@
                 dot.title = '🟢 Aman';
             }
 
-            // Update log
-            const sensorName = sensors.find(s => s.id === sensorId)?.name || sensorId;
-            const statusText = isActive ? '🚨 Gerakan' : '✅ Aman';
-            document.getElementById('lastEvent').textContent =
-                `${sensorName}: ${statusText} (${new Date().toLocaleTimeString()})`;
-
-            // Update jumlah sensor aktif
             const activeNow = document.querySelectorAll('.sensor-dot.active').length;
             document.getElementById('activeCount').textContent = `${activeNow} aktif`;
+            document.getElementById('lastEvent').textContent =
+                `${dot.title} — ${sensorId} (${new Date().toLocaleTimeString('id-ID')})`;
         }
 
         // ================================================================
-        // 4. JAM REAL-TIME DI HEADER
-        // ================================================================
-        function updateClock() {
-            document.getElementById('clockTime').textContent = new Date().toLocaleTimeString('id-ID');
-        }
-        updateClock();
-        setInterval(updateClock, 1000);
-
-        // ================================================================
-        // 5. SIMULASI DATA (akan diganti dengan WebSocket nanti)
-        // ================================================================
-        function simulateSensorData() {
-            const numActive = Math.random() > 0.6 ? 2 : 1;
-            const shuffled = [...sensors].sort(() => Math.random() - 0.5);
-            const selected = shuffled.slice(0, numActive);
-
-            sensors.forEach(s => updateSensor(s.id, false));
-            selected.forEach(s => updateSensor(s.id, true));
-
-            if (selected.length > 0) {
-                const timeout = 3000 + Math.random() * 2000;
-                setTimeout(() => {
-                    selected.forEach(s => updateSensor(s.id, false));
-                }, timeout);
-            }
-        }
-
-        setInterval(simulateSensorData, 4000 + Math.random() * 2000);
-        setTimeout(simulateSensorData, 1000);
-
-        // ================================================================
-        // 6. (NANTI) KONEKSI WEBSOCKET KE ESP32
-        //    Hapus/comment blok simulasi di atas saat memakai ini,
-        //    supaya data simulasi tidak tabrakan dengan data asli.
+        // KONEKSI WEBSOCKET KE ESP32
+        // Ganti IP sesuai alamat ESP32 di jaringan lokal
         // ================================================================
         /*
         const socket = new WebSocket('ws://192.168.1.100:81');
 
         socket.onopen = function() {
             console.log('Terhubung ke ESP32');
-            document.getElementById('lastEvent').textContent = '🟢 Terhubung';
+            document.getElementById('lastEvent').textContent = '🟢 Terhubung ke ESP32';
         };
 
         socket.onmessage = function(event) {
@@ -756,18 +678,16 @@
         };
 
         socket.onclose = function() {
-            console.log('Koneksi putus, mencoba lagi dalam 3 detik...');
-            document.getElementById('lastEvent').textContent = '🔴 Terputus';
+            document.getElementById('lastEvent').textContent = '🔴 Koneksi terputus...';
             setTimeout(() => location.reload(), 3000);
         };
 
         socket.onerror = function(error) {
-            console.log('Error WebSocket:', error);
+            console.log('WebSocket error:', error);
         };
         */
 
-        console.log('🏠 Dashboard Home Monitoring siap!');
-        console.log(`📡 ${sensors.length} sensor terpasang.`);
+        console.log('🏠 Dashboard Home Monitoring siap. Hubungkan WebSocket ESP32 untuk data live.');
     </script>
 
 </body>
