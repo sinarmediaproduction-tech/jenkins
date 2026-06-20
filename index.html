@@ -32,7 +32,7 @@
             width: 100vw;
             display: grid;
             grid-template-rows: auto 1fr;
-            padding: clamp(14px, 1.4vw, 26px);
+            padding: clamp(8px, 0.8vw, 14px);
             gap: clamp(12px, 1.2vw, 20px);
         }
 
@@ -99,8 +99,8 @@
         /* ==================== MAIN CONTENT: FLOORPLAN + SIDEBAR ==================== */
         .main-content {
             display: grid;
-            grid-template-columns: 1fr minmax(280px, 22vw);
-            gap: clamp(12px, 1.2vw, 20px);
+            grid-template-columns: 1fr minmax(240px, 17vw);
+            gap: clamp(8px, 0.8vw, 14px);
             align-items: start;
         }
 
@@ -468,7 +468,7 @@
             <!-- FLOORPLAN -->
             <div class="floorplan-container" id="floorplan">
                 <!-- Denah rumah SVG (inline) -->
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28233.56 40606.29" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28233.56 40606.29" width="100%" height="100%" preserveAspectRatio="xMidYMin meet" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd;">
   <defs>
     <style>
       .bg { fill: rgba(0,212,255,0.04); stroke: #4a7fa8; stroke-width: 17.64; }
@@ -482,9 +482,7 @@
     </style>
   </defs>
   <!-- Outer Border removed for seamless integration -->
-  <!-- Main Background Shape -->
-  <polygon class="bg" points="13411.48,3444.07 4721.63,4468.75 4721.63,14435.26 5512.1,14435.26 5512.1,26099.66 11230.1,26099.66 11230.1,37413.3 23374.36,37413.3 23374.36,17870.17 13411.48,17870.17 "/>
-  <!-- Inner Background Shape -->
+  <!-- Outer wall -->
   <polygon class="bg" points="13285.93,3318.53 4596.09,4343.21 4596.09,14309.71 5386.56,14309.71 5386.56,25974.11 11104.55,25974.11 11104.55,37287.75 23248.82,37287.75 23248.82,17744.62 13285.93,17744.62 "/>
   <!-- Top Area Rooms -->
   <rect class="room-bg" x="12444.86" y="20329.21" width="9999.62" height="5999.77"/>
