@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏠 Home Monitoring Dashboard</title>
+    <style>
+        /* ==================== RESET & GLOBAL ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e17;
+            background-image:
+                radial-gradient(circle at 15% 10%, rgba(0, 150, 255, 0.06), transparent 40%),
+                radial-gradient(circle at 85% 90%, rgba(0, 255, 136, 0.04), transparent 40%);
+            color: #e8edf5;
+        }
+
+        /* ==================== FULL-SCREEN GRID SHELL ==================== */
+        .dashboard {
+            height: 100vh;
+            width: 100vw;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            padding: clamp(14px, 1.4vw, 26px);
+            gap: clamp(12px, 1.2vw, 20px);
+        }
+
+        /* ==================== HEADER ==================== */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: clamp(10px, 1vw, 16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .dashboard-header h1 {
+            color: #e8edf5;
+            font-size: clamp(18px, 1.8vw, 28px);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .dashboard-header h1 span {
+            color: #00d4ff;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: clamp(16px, 2vw, 36px);
+        }
+
+        .clock {
+            color: #8899bb;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(13px, 1vw, 16px);
+            letter-spacing: 0.5px;
+        }
+
+        .clock span {
+            color: #e8edf5;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #8899bb;
+            font-size: clamp(12px, 0.9vw, 14px);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: blink 1.5s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* ==================== MAIN CONTENT: FLOORPLAN + SIDEBAR ==================== */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr minmax(280px, 22vw);
+            gap: clamp(12px, 1.2vw, 20px);
+            min-height: 0;
+        }
+
+        /* ==================== FLOORPLAN CONTAINER ==================== */
+        .floorplan-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            background: #0d1422;
+            box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04);
+        }
+
+        .floorplan-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            opacity: 0.85;
+            transition: opacity 0.3s;
+        }
+
+        .floorplan-container:hover img {
+            opacity: 1;
+        }
+
+        /* Fallback tampil saat gambar denah gagal dimuat */
+        .floorplan-fallback {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #44557a;
+            background:
+                linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px) 0 0 / 40px 40px,
+                linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px) 0 0 / 40px 40px;
+        }
+
+        .floorplan-fallback.show {
+            display: flex;
+        }
+
+        .floorplan-fallback .icon {
+            font-size: clamp(32px, 4vw, 56px);
+            opacity: 0.5;
+        }
+
+        .floorplan-fallback p {
+            font-size: clamp(12px, 1vw, 15px);
+            max-width: 320px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .floorplan-fallback code {
+            color: #00d4ff;
+            background: rgba(0, 212, 255, 0.08);
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* ==================== SENSOR DOT ==================== */
+        .sensor-dot {
+            position: absolute;
+            width: clamp(16px, 1.6vw, 26px);
+            height: clamp(16px, 1.6vw, 26px);
+            border-radius: 50%;
+            background: #2a3a5a;
+            border: 2.5px solid rgba(255, 255, 255, 0.15);
+            transform: translate(-50%, -50%);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .sensor-dot::before {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.5s;
+        }
+
+        /* ==================== STATUS SENSOR ==================== */
+        .sensor-dot.idle {
+            background: #2a5a3a;
+            border-color: rgba(0, 255, 136, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.1);
+        }
+
+        .sensor-dot.idle::before {
+            border-color: rgba(0, 255, 136, 0.05);
+        }
+
+        .sensor-dot.active {
+            background: #ff3344;
+            border-color: rgba(255, 51, 68, 0.8);
+            animation: pulse-wave 1.8s ease-out infinite;
+            box-shadow: 0 0 40px rgba(255, 51, 68, 0.4);
+        }
+
+        .sensor-dot.active::before {
+            border-color: rgba(255, 51, 68, 0.3);
+            animation: pulse-ring 1.8s ease-out infinite;
+        }
+
+        @keyframes pulse-wave {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 0 20px rgba(255, 51, 68, 0.5);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.3);
+                box-shadow: 0 0 50px rgba(255, 51, 68, 0.7);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 0 20px rgba(255, 51, 68, 0.5);
+            }
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        /* ==================== SENSOR LABEL ==================== */
+        .sensor-label {
+            position: absolute;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: clamp(9px, 0.75vw, 12px);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+            pointer-events: none;
+            z-index: 11;
+            white-space: nowrap;
+            padding: 3px 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s;
+        }
+
+        .sensor-label.active-label {
+            color: #ff6677;
+            border-color: rgba(255, 51, 68, 0.3);
+            box-shadow: 0 0 20px rgba(255, 51, 68, 0.15);
+        }
+
+        /* ==================== SIDEBAR ==================== */
+        .sidebar {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: clamp(10px, 1vw, 16px);
+            min-height: 0;
+        }
+
+        .panel {
+            background: linear-gradient(145deg, #141b2b, #1a2233);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: clamp(12px, 1.1vw, 18px);
+        }
+
+        .panel-title {
+            font-size: clamp(11px, 0.85vw, 13px);
+            color: #6677a0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: clamp(8px, 0.9vw, 14px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .summary-count {
+            color: #00d4ff;
+            font-weight: 700;
+        }
+
+        /* --- Sensor list panel --- */
+        .sensor-list-panel {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sensor-list {
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .sensor-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .sensor-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+        }
+
+        .sensor-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: clamp(8px, 0.8vw, 12px);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.3s;
+        }
+
+        .sensor-row.is-active {
+            background: rgba(255, 51, 68, 0.08);
+            border-color: rgba(255, 51, 68, 0.25);
+        }
+
+        .sensor-row-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #2a5a3a;
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+
+        .sensor-row.is-active .sensor-row-dot {
+            background: #ff3344;
+            box-shadow: 0 0 10px rgba(255, 51, 68, 0.7);
+            animation: pulse-wave 1.8s ease-out infinite;
+        }
+
+        .sensor-row-name {
+            font-size: clamp(12px, 0.95vw, 14px);
+            color: #c5cfe0;
+            flex: 1;
+        }
+
+        .sensor-row-status {
+            font-size: clamp(10px, 0.8vw, 12px);
+            color: #4a7a5a;
+            font-weight: 600;
+        }
+
+        .sensor-row.is-active .sensor-row-status {
+            color: #ff6677;
+        }
+
+        /* --- Legend panel --- */
+        .legend {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: clamp(11px, 0.85vw, 13px);
+            color: #8899bb;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .legend-color.idle-color {
+            background: #2a5a3a;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .legend-color.active-color {
+            background: #ff3344;
+            border: 1px solid rgba(255, 51, 68, 0.5);
+            animation: pulse-wave 1.8s ease-out infinite;
+        }
+
+        /* --- Log panel --- */
+        .log-panel {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .log-area {
+            color: #6a7a9a;
+            font-size: clamp(11px, 0.85vw, 13px);
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+        }
+
+        .log-area span {
+            color: #00d4ff;
+        }
+
+        /* ==================== RESPONSIVE (di luar konteks monitor HD) ==================== */
+        @media (max-width: 900px) {
+            html, body {
+                overflow: auto;
+            }
+
+            .dashboard {
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                grid-template-columns: 1fr;
+                grid-template-rows: 50vh auto;
+            }
+
+            .floorplan-container {
+                height: 50vh;
+            }
+
+            .sidebar {
+                grid-template-rows: auto auto auto;
+            }
+
+            .sensor-list {
+                max-height: 240px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <!-- HEADER -->
+        <div class="dashboard-header">
+            <h1>🏠 Home <span>Monitor</span></h1>
+            <div class="header-right">
+                <div class="clock"><span id="clockTime">--:--:--</span></div>
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span>Sistem Aktif</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN: FLOORPLAN + SIDEBAR -->
+        <div class="main-content">
+
+            <!-- FLOORPLAN -->
+            <div class="floorplan-container" id="floorplan">
+                <!-- GANTI 'denah-rumah.jpg' dengan gambar denah Anda -->
+                <img src="denah-rumah.jpg" alt="Denah Rumah" id="floorplan-image"
+                     onerror="document.getElementById('floorplanFallback').classList.add('show'); this.style.display='none';">
+                <div class="floorplan-fallback" id="floorplanFallback">
+                    <div class="icon">🗺️</div>
+                    <p>Gambar denah belum ditemukan.<br>Letakkan file di samping HTML ini dan beri nama<br><code>denah-rumah.jpg</code>, atau ubah atribut <code>src</code> pada tag <code>&lt;img id="floorplan-image"&gt;</code>.</p>
+                </div>
+            </div>
+
+            <!-- SIDEBAR -->
+            <div class="sidebar">
+
+                <!-- SENSOR LIST -->
+                <div class="panel sensor-list-panel">
+                    <div class="panel-title">
+                        <span>Daftar Sensor</span>
+                        <span class="summary-count" id="activeCount">0 aktif</span>
+                    </div>
+                    <div class="sensor-list" id="sensorList"></div>
+                </div>
+
+                <!-- LEGEND -->
+                <div class="panel">
+                    <div class="panel-title">Keterangan</div>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <span class="legend-color idle-color"></span>
+                            Aman
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color active-color"></span>
+                            Gerakan Terdeteksi
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LOG -->
+                <div class="panel log-panel">
+                    <div class="panel-title">Aktivitas Terakhir</div>
+                    <div class="log-area" id="logArea">
+                        <span id="lastEvent">Menunggu...</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        // 1. DATA SENSOR
+        //    Sesuaikan koordinat (x, y dalam %) dengan posisi ruangan di denah
+        // ================================================================
+        const sensors = [
+            { id: 'sensor-rtamu', name: 'Ruang Tamu', x: 22, y: 35, status: 'idle' },
+            { id: 'sensor-dapur', name: 'Dapur', x: 75, y: 58, status: 'idle' },
+            { id: 'sensor-ktidur', name: 'Kamar Tidur', x: 28, y: 72, status: 'idle' },
+            { id: 'sensor-kmandi', name: 'Kamar Mandi', x: 55, y: 78, status: 'idle' },
+            { id: 'sensor-garasi', name: 'Garasi', x: 82, y: 20, status: 'idle' },
+            { id: 'sensor-tblkng', name: 'Taman Belakang', x: 50, y: 10, status: 'idle' },
+        ];
+
+        // ================================================================
+        // 2. BUAT ELEMEN SENSOR DI ATAS DENAH + DI DAFTAR SAMPING
+        // ================================================================
+        const container = document.getElementById('floorplan');
+        const sensorList = document.getElementById('sensorList');
+
+        sensors.forEach(sensor => {
+            // --- Titik sensor di denah ---
+            const dot = document.createElement('div');
+            dot.id = sensor.id;
+            dot.className = `sensor-dot idle`;
+            dot.style.left = sensor.x + '%';
+            dot.style.top = sensor.y + '%';
+            dot.title = sensor.name;
+            container.appendChild(dot);
+
+            // --- Label nama ruangan di denah ---
+            const label = document.createElement('div');
+            label.className = 'sensor-label';
+            label.id = sensor.id + '-label';
+            label.textContent = sensor.name;
+            label.style.left = sensor.x + '%';
+            label.style.top = (sensor.y + 4.5) + '%';
+            container.appendChild(label);
+
+            // --- Baris di panel daftar sensor ---
+            const row = document.createElement('div');
+            row.className = 'sensor-row';
+            row.id = sensor.id + '-row';
+            row.innerHTML = `
+                <span class="sensor-row-dot"></span>
+                <span class="sensor-row-name">${sensor.name}</span>
+                <span class="sensor-row-status">Aman</span>
+            `;
+            sensorList.appendChild(row);
+        });
+
+        // ================================================================
+        // 3. FUNGSI UPDATE SENSOR
+        // ================================================================
+        function updateSensor(sensorId, isActive) {
+            const dot = document.getElementById(sensorId);
+            const label = document.getElementById(sensorId + '-label');
+            const row = document.getElementById(sensorId + '-row');
+            if (!dot) return;
+
+            dot.classList.remove('idle', 'active');
+
+            if (isActive) {
+                dot.classList.add('active');
+                if (label) label.classList.add('active-label');
+                if (row) {
+                    row.classList.add('is-active');
+                    row.querySelector('.sensor-row-status').textContent = 'Gerakan';
+                }
+                dot.title = '🔴 Gerakan terdeteksi!';
+            } else {
+                dot.classList.add('idle');
+                if (label) label.classList.remove('active-label');
+                if (row) {
+                    row.classList.remove('is-active');
+                    row.querySelector('.sensor-row-status').textContent = 'Aman';
+                }
+                dot.title = '🟢 Aman';
+            }
+
+            // Update log
+            const sensorName = sensors.find(s => s.id === sensorId)?.name || sensorId;
+            const statusText = isActive ? '🚨 Gerakan' : '✅ Aman';
+            document.getElementById('lastEvent').textContent =
+                `${sensorName}: ${statusText} (${new Date().toLocaleTimeString()})`;
+
+            // Update jumlah sensor aktif
+            const activeNow = document.querySelectorAll('.sensor-dot.active').length;
+            document.getElementById('activeCount').textContent = `${activeNow} aktif`;
+        }
+
+        // ================================================================
+        // 4. JAM REAL-TIME DI HEADER
+        // ================================================================
+        function updateClock() {
+            document.getElementById('clockTime').textContent = new Date().toLocaleTimeString('id-ID');
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // ================================================================
+        // 5. SIMULASI DATA (akan diganti dengan WebSocket nanti)
+        // ================================================================
+        function simulateSensorData() {
+            const numActive = Math.random() > 0.6 ? 2 : 1;
+            const shuffled = [...sensors].sort(() => Math.random() - 0.5);
+            const selected = shuffled.slice(0, numActive);
+
+            sensors.forEach(s => updateSensor(s.id, false));
+            selected.forEach(s => updateSensor(s.id, true));
+
+            if (selected.length > 0) {
+                const timeout = 3000 + Math.random() * 2000;
+                setTimeout(() => {
+                    selected.forEach(s => updateSensor(s.id, false));
+                }, timeout);
+            }
+        }
+
+        setInterval(simulateSensorData, 4000 + Math.random() * 2000);
+        setTimeout(simulateSensorData, 1000);
+
+        // ================================================================
+        // 6. (NANTI) KONEKSI WEBSOCKET KE ESP32
+        //    Hapus/comment blok simulasi di atas saat memakai ini,
+        //    supaya data simulasi tidak tabrakan dengan data asli.
+        // ================================================================
+        /*
+        const socket = new WebSocket('ws://192.168.1.100:81');
+
+        socket.onopen = function() {
+            console.log('Terhubung ke ESP32');
+            document.getElementById('lastEvent').textContent = '🟢 Terhubung';
+        };
+
+        socket.onmessage = function(event) {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.sensorId && typeof data.motion === 'boolean') {
+                    updateSensor(data.sensorId, data.motion);
+                }
+            } catch (e) {
+                console.log('Data tidak valid:', event.data);
+            }
+        };
+
+        socket.onclose = function() {
+            console.log('Koneksi putus, mencoba lagi dalam 3 detik...');
+            document.getElementById('lastEvent').textContent = '🔴 Terputus';
+            setTimeout(() => location.reload(), 3000);
+        };
+
+        socket.onerror = function(error) {
+            console.log('Error WebSocket:', error);
+        };
+        */
+
+        console.log('🏠 Dashboard Home Monitoring siap!');
+        console.log(`📡 ${sensors.length} sensor terpasang.`);
+    </script>
+
+</body>
+</html>
