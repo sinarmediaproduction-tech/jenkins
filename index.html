@@ -111,11 +111,12 @@
             border-radius: 18px;
             overflow: hidden;
             background: #0a0e17;
+            aspect-ratio: 28233.56 / 40606.29;
         }
 
         .floorplan-container svg {
             width: 100%;
-            height: auto;
+            height: 100%;
             display: block;
             opacity: 0.72;
             transition: opacity 0.3s;
@@ -125,52 +126,14 @@
             opacity: 0.92;
         }
 
-        /* Fallback tampil saat gambar denah gagal dimuat */
-        .floorplan-fallback {
-            position: absolute;
-            inset: 0;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            color: #44557a;
-            background:
-                linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px) 0 0 / 40px 40px,
-                linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px) 0 0 / 40px 40px;
-        }
-
-        .floorplan-fallback.show {
-            display: flex;
-        }
-
-        .floorplan-fallback .icon {
-            font-size: clamp(32px, 4vw, 56px);
-            opacity: 0.5;
-        }
-
-        .floorplan-fallback p {
-            font-size: clamp(12px, 1vw, 15px);
-            max-width: 320px;
-            text-align: center;
-            line-height: 1.5;
-        }
-
-        .floorplan-fallback code {
-            color: #00d4ff;
-            background: rgba(0, 212, 255, 0.08);
-            padding: 2px 8px;
-            border-radius: 6px;
-        }
-
         /* ==================== SENSOR DOT ==================== */
         .sensor-dot {
             position: absolute;
-            width: clamp(16px, 1.6vw, 26px);
-            height: clamp(16px, 1.6vw, 26px);
+            width: clamp(18px, 1.6vw, 28px);
+            height: clamp(18px, 1.6vw, 28px);
             border-radius: 50%;
-            background: #2a3a5a;
-            border: 2.5px solid rgba(255, 255, 255, 0.15);
+            background: #1a3a2a;
+            border: 2.5px solid rgba(0, 255, 136, 0.2);
             transform: translate(-50%, -50%);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             cursor: pointer;
@@ -188,10 +151,33 @@
             transition: all 0.5s;
         }
 
+        .sensor-dot .sensor-tooltip {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(8px);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: clamp(9px, 0.7vw, 11px);
+            color: #c5cfe0;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .sensor-dot:hover .sensor-tooltip {
+            opacity: 1;
+            bottom: calc(100% + 16px);
+        }
+
         /* ==================== STATUS SENSOR ==================== */
         .sensor-dot.idle {
-            background: #2a5a3a;
-            border-color: rgba(0, 255, 136, 0.2);
+            background: #1a5a3a;
+            border-color: rgba(0, 255, 136, 0.3);
             box-shadow: 0 0 15px rgba(0, 255, 136, 0.1);
         }
 
@@ -237,32 +223,6 @@
             }
         }
 
-        /* ==================== SENSOR LABEL ==================== */
-        .sensor-label {
-            position: absolute;
-            transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.8);
-            font-size: clamp(9px, 0.75vw, 12px);
-            font-weight: 500;
-            letter-spacing: 0.3px;
-            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
-            pointer-events: none;
-            z-index: 11;
-            white-space: nowrap;
-            padding: 3px 10px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 12px;
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            transition: all 0.3s;
-        }
-
-        .sensor-label.active-label {
-            color: #ff6677;
-            border-color: rgba(255, 51, 68, 0.3);
-            box-shadow: 0 0 20px rgba(255, 51, 68, 0.15);
-        }
-
         /* ==================== SIDEBAR ==================== */
         .sidebar {
             display: flex;
@@ -306,7 +266,9 @@
         .sensor-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
+            max-height: 380px;
+            overflow-y: auto;
         }
 
         .sensor-list::-webkit-scrollbar {
@@ -322,7 +284,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: clamp(8px, 0.8vw, 12px);
+            padding: clamp(6px, 0.7vw, 10px) clamp(10px, 0.8vw, 14px);
             border-radius: 10px;
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
@@ -338,8 +300,8 @@
             width: 9px;
             height: 9px;
             border-radius: 50%;
-            background: #2a5a3a;
-            box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+            background: #1a5a3a;
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
             flex-shrink: 0;
             transition: all 0.3s;
         }
@@ -351,15 +313,16 @@
         }
 
         .sensor-row-name {
-            font-size: clamp(12px, 0.95vw, 14px);
+            font-size: clamp(11px, 0.85vw, 13px);
             color: #c5cfe0;
             flex: 1;
         }
 
         .sensor-row-status {
-            font-size: clamp(10px, 0.8vw, 12px);
-            color: #4a7a5a;
+            font-size: clamp(10px, 0.75vw, 12px);
+            color: #4a8a5a;
             font-weight: 600;
+            transition: all 0.3s;
         }
 
         .sensor-row.is-active .sensor-row-status {
@@ -389,7 +352,7 @@
         }
 
         .legend-color.idle-color {
-            background: #2a5a3a;
+            background: #1a5a3a;
             border: 1px solid rgba(0, 255, 136, 0.3);
         }
 
@@ -411,13 +374,32 @@
             font-size: clamp(11px, 0.85vw, 13px);
             font-family: 'Courier New', monospace;
             line-height: 1.6;
+            min-height: 40px;
         }
 
-        .log-area span {
+        .log-area .log-entry {
+            display: block;
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .log-area .log-entry .time {
+            color: #44557a;
+        }
+
+        .log-area .log-entry .sensor-name {
             color: #00d4ff;
         }
 
-        /* ==================== RESPONSIVE (di luar konteks monitor HD) ==================== */
+        .log-area .log-entry .status-ok {
+            color: #4a8a5a;
+        }
+
+        .log-area .log-entry .status-motion {
+            color: #ff6677;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
         @media (max-width: 900px) {
             html, body {
                 overflow: auto;
@@ -430,19 +412,20 @@
 
             .main-content {
                 grid-template-columns: 1fr;
-                grid-template-rows: 50vh auto;
+                grid-template-rows: auto auto;
             }
 
             .floorplan-container {
-                height: 50vh;
+                aspect-ratio: 28233.56 / 40606.29;
+                min-height: 50vh;
             }
 
             .sidebar {
-                grid-template-rows: auto auto auto;
+                position: static;
             }
 
             .sensor-list {
-                max-height: 240px;
+                max-height: 200px;
             }
         }
     </style>
@@ -566,6 +549,103 @@
   <text x="8274" y="6721.49" class="text-white">Ekpansi</text>
   <text x="7964.87" y="6956.8" class="text-white">Green</text>
 </svg>
+
+                <!-- ============================================================ -->
+                <!-- SENSOR DOT - Posisi di atas SVG (menggunakan CSS absolute)    -->
+                <!-- ============================================================ -->
+
+                <!-- == LANTAI 1 == -->
+                <!-- Dapur -->
+                <div class="sensor-dot idle" id="sensor-dapur" style="left: 13.5%; top: 39.5%;" data-room="Dapur">
+                    <span class="sensor-tooltip">Dapur</span>
+                </div>
+
+                <!-- Kamar Kiri 1 -->
+                <div class="sensor-dot idle" id="sensor-kamar-kiri1" style="left: 9.8%; top: 49%;" data-room="Kamar Kiri 1">
+                    <span class="sensor-tooltip">Kamar 1</span>
+                </div>
+
+                <!-- Kamar Kiri 2 -->
+                <div class="sensor-dot idle" id="sensor-kamar-kiri2" style="left: 10.2%; top: 56%;" data-room="Kamar Kiri 2">
+                    <span class="sensor-tooltip">Kamar 2</span>
+                </div>
+
+                <!-- Kitchen -->
+                <div class="sensor-dot idle" id="sensor-kitchen" style="left: 16.8%; top: 56.5%;" data-room="Kitchen">
+                    <span class="sensor-tooltip">Kitchen</span>
+                </div>
+
+                <!-- Ruang Tengah -->
+                <div class="sensor-dot idle" id="sensor-ruang" style="left: 20.5%; top: 49%;" data-room="Ruang">
+                    <span class="sensor-tooltip">Ruang</span>
+                </div>
+
+                <!-- Gudang -->
+                <div class="sensor-dot idle" id="sensor-gudang" style="left: 30.5%; top: 49%;" data-room="Gudang">
+                    <span class="sensor-tooltip">Gudang</span>
+                </div>
+
+                <!-- Family Room -->
+                <div class="sensor-dot idle" id="sensor-family" style="left: 25.5%; top: 58%;" data-room="Family">
+                    <span class="sensor-tooltip">Family</span>
+                </div>
+
+                <!-- Kamar Tengah -->
+                <div class="sensor-dot idle" id="sensor-kamar-tengah" style="left: 30.5%; top: 56.5%;" data-room="Kamar Tengah">
+                    <span class="sensor-tooltip">Kamar 3</span>
+                </div>
+
+                <!-- Kamar Atas -->
+                <div class="sensor-dot idle" id="sensor-kamar-atas" style="left: 38%; top: 49%;" data-room="Kamar Atas">
+                    <span class="sensor-tooltip">Kamar 4</span>
+                </div>
+
+                <!-- == LANTAI 2 (Garasi/Teras) == -->
+                <!-- Garasi -->
+                <div class="sensor-dot idle" id="sensor-garasi" style="left: 43%; top: 85%;" data-room="Garasi">
+                    <span class="sensor-tooltip">Garasi</span>
+                </div>
+
+                <!-- Teras -->
+                <div class="sensor-dot idle" id="sensor-teras" style="left: 27%; top: 82%;" data-room="Teras">
+                    <span class="sensor-tooltip">Teras</span>
+                </div>
+
+                <!-- Kamar Atas Garasi -->
+                <div class="sensor-dot idle" id="sensor-kamar-atas2" style="left: 32%; top: 73%;" data-room="Kamar Atas 2">
+                    <span class="sensor-tooltip">Kamar 5</span>
+                </div>
+
+                <!-- == AREA EKSTERIOR == -->
+                <!-- Aviary -->
+                <div class="sensor-dot idle" id="sensor-aviary" style="left: 16.5%; top: 29%;" data-room="Aviary">
+                    <span class="sensor-tooltip">Aviary</span>
+                </div>
+
+                <!-- Work -->
+                <div class="sensor-dot idle" id="sensor-work" style="left: 15.5%; top: 25%;" data-room="Work">
+                    <span class="sensor-tooltip">Work</span>
+                </div>
+
+                <!-- Apotek -->
+                <div class="sensor-dot idle" id="sensor-apotek" style="left: 11%; top: 22%;" data-room="Apotek">
+                    <span class="sensor-tooltip">Apotek</span>
+                </div>
+
+                <!-- Ekpansi Green -->
+                <div class="sensor-dot idle" id="sensor-ekpansi" style="left: 10%; top: 16%;" data-room="Ekpansi Green">
+                    <span class="sensor-tooltip">Ekpansi Green</span>
+                </div>
+
+                <!-- Tempat -->
+                <div class="sensor-dot idle" id="sensor-tempat" style="left: 38.5%; top: 52.5%;" data-room="Tempat">
+                    <span class="sensor-tooltip">Tempat</span>
+                </div>
+
+                <!-- Laundry (dari teks) -->
+                <div class="sensor-dot idle" id="sensor-laundry" style="left: 20%; top: 40%;" data-room="Laundry">
+                    <span class="sensor-tooltip">Laundry</span>
+                </div>
             </div>
 
             <!-- SIDEBAR -->
@@ -609,6 +689,46 @@
 
     <script>
         // ================================================================
+        // DATA SENSOR
+        // ================================================================
+        const sensors = [
+            { id: 'sensor-dapur', name: 'Dapur' },
+            { id: 'sensor-kamar-kiri1', name: 'Kamar 1' },
+            { id: 'sensor-kamar-kiri2', name: 'Kamar 2' },
+            { id: 'sensor-kitchen', name: 'Kitchen' },
+            { id: 'sensor-ruang', name: 'Ruang' },
+            { id: 'sensor-gudang', name: 'Gudang' },
+            { id: 'sensor-family', name: 'Family' },
+            { id: 'sensor-kamar-tengah', name: 'Kamar 3' },
+            { id: 'sensor-kamar-atas', name: 'Kamar 4' },
+            { id: 'sensor-garasi', name: 'Garasi' },
+            { id: 'sensor-teras', name: 'Teras' },
+            { id: 'sensor-kamar-atas2', name: 'Kamar 5' },
+            { id: 'sensor-aviary', name: 'Aviary' },
+            { id: 'sensor-work', name: 'Work' },
+            { id: 'sensor-apotek', name: 'Apotek' },
+            { id: 'sensor-ekpansi', name: 'Ekpansi Green' },
+            { id: 'sensor-tempat', name: 'Tempat' },
+            { id: 'sensor-laundry', name: 'Laundry' }
+        ];
+
+        // ================================================================
+        // BUILD SENSOR LIST IN SIDEBAR
+        // ================================================================
+        const sensorListEl = document.getElementById('sensorList');
+        sensors.forEach(s => {
+            const row = document.createElement('div');
+            row.className = 'sensor-row';
+            row.id = s.id + '-row';
+            row.innerHTML = `
+                <span class="sensor-row-dot"></span>
+                <span class="sensor-row-name">${s.name}</span>
+                <span class="sensor-row-status">Aman</span>
+            `;
+            sensorListEl.appendChild(row);
+        });
+
+        // ================================================================
         // JAM REAL-TIME DI HEADER
         // ================================================================
         function updateClock() {
@@ -618,50 +738,99 @@
         setInterval(updateClock, 1000);
 
         // ================================================================
-        // FUNGSI UPDATE SENSOR — dipanggil dari WebSocket ESP32
-        // Contoh payload: { "sensorId": "sensor-rtamu", "motion": true }
+        // LOG ACTIVITY
         // ================================================================
-        function updateSensor(sensorId, isActive) {
-            const dot = document.getElementById(sensorId);
-            const label = document.getElementById(sensorId + '-label');
-            const row = document.getElementById(sensorId + '-row');
-            if (!dot) return;
+        let logEntries = [];
 
-            dot.classList.remove('idle', 'active');
-            if (isActive) {
-                dot.classList.add('active');
-                if (label) label.classList.add('active-label');
-                if (row) {
-                    row.classList.add('is-active');
-                    row.querySelector('.sensor-row-status').textContent = 'Gerakan';
-                }
-                dot.title = '🔴 Gerakan terdeteksi!';
-            } else {
-                dot.classList.add('idle');
-                if (label) label.classList.remove('active-label');
-                if (row) {
-                    row.classList.remove('is-active');
-                    row.querySelector('.sensor-row-status').textContent = 'Aman';
-                }
-                dot.title = '🟢 Aman';
-            }
+        function addLog(sensorName, status, isActive) {
+            const time = new Date().toLocaleTimeString('id-ID');
+            const statusText = isActive ? '🔴 Gerakan' : '🟢 Aman';
+            const statusClass = isActive ? 'status-motion' : 'status-ok';
 
-            const activeNow = document.querySelectorAll('.sensor-dot.active').length;
-            document.getElementById('activeCount').textContent = `${activeNow} aktif`;
-            document.getElementById('lastEvent').textContent =
-                `${dot.title} — ${sensorId} (${new Date().toLocaleTimeString('id-ID')})`;
+            logEntries.unshift({ time, sensorName, statusText, statusClass, isActive });
+            if (logEntries.length > 50) logEntries.pop();
+
+            const logArea = document.getElementById('logArea');
+            logArea.innerHTML = logEntries.map(entry =>
+                `<span class="log-entry">
+                    <span class="time">${entry.time}</span>
+                    <span class="sensor-name">${entry.sensorName}</span>
+                    <span class="${entry.statusClass}">${entry.statusText}</span>
+                </span>`
+            ).join('');
         }
 
         // ================================================================
-        // KONEKSI WEBSOCKET KE ESP32
-        // Ganti IP sesuai alamat ESP32 di jaringan lokal
+        // FUNGSI UPDATE SENSOR
+        // ================================================================
+        function updateSensor(sensorId, isActive) {
+            const dot = document.getElementById(sensorId);
+            if (!dot) return;
+
+            const roomName = dot.dataset.room || sensorId;
+            const row = document.getElementById(sensorId + '-row');
+            const statusEl = row ? row.querySelector('.sensor-row-status') : null;
+
+            // Update dot
+            dot.classList.remove('idle', 'active');
+            if (isActive) {
+                dot.classList.add('active');
+                if (statusEl) statusEl.textContent = 'Gerakan';
+                if (row) row.classList.add('is-active');
+                dot.title = '🔴 Gerakan terdeteksi!';
+            } else {
+                dot.classList.add('idle');
+                if (statusEl) statusEl.textContent = 'Aman';
+                if (row) row.classList.remove('is-active');
+                dot.title = '🟢 Aman';
+            }
+
+            // Update counter
+            const activeNow = document.querySelectorAll('.sensor-dot.active').length;
+            document.getElementById('activeCount').textContent = `${activeNow} aktif`;
+
+            // Add log
+            addLog(roomName, isActive ? 'Gerakan' : 'Aman', isActive);
+        }
+
+        // ================================================================
+        // DEMO: SIMULASI SENSOR AKTIF RANDOM (untuk testing tanpa ESP32)
+        // ================================================================
+        let demoInterval = null;
+
+        function startDemo() {
+            // Set all to idle first
+            sensors.forEach(s => updateSensor(s.id, false));
+
+            demoInterval = setInterval(() => {
+                // Pilih 1-3 sensor acak untuk diaktifkan
+                const numActive = Math.floor(Math.random() * 3) + 1;
+                const activeIds = [];
+                const shuffled = [...sensors].sort(() => Math.random() - 0.5);
+
+                for (let i = 0; i < numActive && i < shuffled.length; i++) {
+                    activeIds.push(shuffled[i].id);
+                }
+
+                // Reset semua ke idle
+                sensors.forEach(s => updateSensor(s.id, false));
+
+                // Aktifkan yang terpilih
+                activeIds.forEach(id => updateSensor(id, true));
+
+            }, 4000);
+        }
+
+        // ================================================================
+        // KONEKSI WEBSOCKET KE ESP32 (siap pakai)
         // ================================================================
         /*
         const socket = new WebSocket('ws://192.168.1.100:81');
 
         socket.onopen = function() {
             console.log('Terhubung ke ESP32');
-            document.getElementById('lastEvent').textContent = '🟢 Terhubung ke ESP32';
+            addLog('Sistem', 'Terhubung ke ESP32', false);
+            if (demoInterval) clearInterval(demoInterval);
         };
 
         socket.onmessage = function(event) {
@@ -676,16 +845,46 @@
         };
 
         socket.onclose = function() {
-            document.getElementById('lastEvent').textContent = '🔴 Koneksi terputus...';
-            setTimeout(() => location.reload(), 3000);
+            addLog('Sistem', 'Koneksi terputus, mode demo', false);
+            startDemo();
         };
 
         socket.onerror = function(error) {
             console.log('WebSocket error:', error);
+            startDemo();
         };
         */
 
-        console.log('🏠 Dashboard Home Monitoring siap. Hubungkan WebSocket ESP32 untuk data live.');
+        // ================================================================
+        // MULAI DENGAN DEMO (jika tidak ada WebSocket)
+        // ================================================================
+        console.log('🏠 Dashboard Home Monitoring siap.');
+        addLog('Sistem', 'Mode Demo - simulasi sensor acak', false);
+        startDemo();
+
+        // ================================================================
+        // FUNGSI MANUAL UNTUK TESTING (bisa dipanggil dari console)
+        // ================================================================
+        window.testSensor = function(sensorId, isActive) {
+            updateSensor(sensorId, isActive);
+        };
+
+        window.testAll = function(isActive) {
+            sensors.forEach(s => updateSensor(s.id, isActive));
+        };
+
+        window.getSensorStatus = function() {
+            const result = {};
+            sensors.forEach(s => {
+                const dot = document.getElementById(s.id);
+                result[s.name] = dot ? dot.classList.contains('active') : false;
+            });
+            return result;
+        };
+
+        console.log('💡 Gunakan testSensor("sensor-dapur", true) untuk menguji sensor');
+        console.log('💡 testAll(true) untuk mengaktifkan semua, testAll(false) untuk menonaktifkan semua');
+        console.log('💡 getSensorStatus() untuk melihat status semua sensor');
     </script>
 
 </body>
