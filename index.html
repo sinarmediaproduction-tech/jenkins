@@ -124,7 +124,8 @@
             transition: opacity 0.3s;
         }
 
-        .floorplan-container:hover img {
+        .floorplan-container:hover img,
+        .floorplan-container:hover svg {
             opacity: 1;
         }
 
@@ -470,13 +471,108 @@
 
             <!-- FLOORPLAN -->
             <div class="floorplan-container" id="floorplan">
-                <!-- GANTI 'denah-rumah.jpg' dengan gambar denah Anda -->
-                <img src="denah-rumah.jpg" alt="Denah Rumah" id="floorplan-image"
-                     onerror="document.getElementById('floorplanFallback').classList.add('show'); this.style.display='none';">
-                <div class="floorplan-fallback" id="floorplanFallback">
-                    <div class="icon">🗺️</div>
-                    <p>Gambar denah belum ditemukan.<br>Letakkan file di samping HTML ini dan beri nama<br><code>denah-rumah.jpg</code>, atau ubah atribut <code>src</code> pada tag <code>&lt;img id="floorplan-image"&gt;</code>.</p>
-                </div>
+                <!-- Denah rumah SVG (inline) -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28233.56 40606.29" width="100%" height="100%" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd; opacity:0.85; transition:opacity 0.3s;">
+  <defs>
+    <style>
+      .bg { fill: none; stroke: #FFFFFF; stroke-width: 17.64; }
+      .wall { fill: none; stroke: #FFFFFF; stroke-width: 20; }
+      .room-bg { fill: none; stroke: #FFFFFF; stroke-width: 17.64; }
+      .room-bg-alt { fill: none; stroke: #FFFFFF; stroke-width: 17.64; }
+      .text-white { fill: #FFFFFF; font-family: 'Arial', sans-serif; font-weight: bold; font-size: 238.79px; }
+      .text-white-sora { fill: #FFFFFF; font-family: 'Sora', sans-serif; font-weight: bold; font-size: 238.79px; }
+      .line-white { fill: none; stroke: #FFFFFF; stroke-width: 20; }
+      .dash-white { fill: none; stroke: #CCCCCC; stroke-width: 130.14; }
+    </style>
+  </defs>
+  <!-- Outer Border -->
+  <rect class="wall" x="10" y="9.99" width="28213.56" height="40586.29"/>
+  <!-- Main Background Shape -->
+  <polygon class="bg" points="13411.48,3444.07 4721.63,4468.75 4721.63,14435.26 5512.1,14435.26 5512.1,26099.66 11230.1,26099.66 11230.1,37413.3 23374.36,37413.3 23374.36,17870.17 13411.48,17870.17 "/>
+  <!-- Inner Background Shape -->
+  <polygon class="bg" points="13285.93,3318.53 4596.09,4343.21 4596.09,14309.71 5386.56,14309.71 5386.56,25974.11 11104.55,25974.11 11104.55,37287.75 23248.82,37287.75 23248.82,17744.62 13285.93,17744.62 "/>
+  <!-- Top Area Rooms -->
+  <rect class="room-bg" x="12444.86" y="20329.21" width="9999.62" height="5999.77"/>
+  <rect class="room-bg" x="12444.86" y="26329.79" width="9999.62" height="4999.81"/>
+  <rect class="room-bg" x="12444.86" y="18528.62" width="9999.62" height="1799.93"/>
+  <!-- Left Area Rooms -->
+  <rect class="room-bg" x="6559.65" y="18522.48" width="5885.22" height="6358.06"/>
+  <rect class="room-bg" x="6559.65" y="14329.43" width="5885.22" height="4193.04"/>
+  <rect class="room-bg" x="6559.64" y="18522.48" width="4343.25" height="1815.79"/>
+  <!-- Complex Room Shapes -->
+  <polygon class="room-bg" points="10902.89,20338.27 6559.64,20338.27 6559.64,24880.54 7430.56,24880.54 7430.56,21188.21 10031.98,21188.21 10031.98,22774.91 10902.89,22774.91 "/>
+  <rect class="room-bg" x="8959.77" y="23912.54" width="2601.42" height="967.99"/>
+  <rect class="room-bg" x="19286.96" y="23770.46" width="3157.53" height="2558.52"/>
+  <rect class="room-bg" x="19286.96" y="21211.93" width="3157.53" height="2558.52"/>
+  <rect class="room-bg" x="19112.62" y="18528.62" width="3331.87" height="1800.58"/>
+  <rect class="room-bg" x="15780.75" y="18528.62" width="3331.87" height="1800.58"/>
+  <rect class="room-bg" x="8119.37" y="12853.22" width="4325.5" height="1476.21"/>
+  <rect class="room-bg" x="7257.28" y="8992.56" width="5164.71" height="2984.91"/>
+  <rect class="room-bg-alt" x="5434.11" y="8992.56" width="1140.15" height="4189.13"/>
+  <rect class="room-bg" x="5664.16" y="8992.56" width="1593.13" height="2984.91"/>
+  <rect class="room-bg" x="5664.16" y="8992.56" width="1593.13" height="1678.27"/>
+  <rect class="room-bg" x="5661.9" y="7694.37" width="6760.1" height="1298.19"/>
+  <rect class="room-bg" x="5661.9" y="7694.37" width="4149.4" height="1298.19"/>
+  <!-- Another Complex Room -->
+  <polygon class="room-bg" points="15925.87,33554.02 19444.59,33554.02 19444.59,37076.51 22444.49,37076.51 22444.49,33554.02 22444.49,31867.63 22444.49,31329.6 12444.86,31329.6 12444.86,33554.02 12444.86,34889.16 15925.87,34889.16 "/>
+  <rect class="room-bg-alt" x="5720.88" y="13859.79" width="956.9" height="464.19"/>
+  <rect class="room-bg" x="12448.88" y="18528.62" width="3331.87" height="4088.78"/>
+  <!-- Garage Area -->
+  <rect class="room-bg" x="13840.74" y="28120.02" width="2999.89" height="3203.37"/>
+  <rect class="room-bg" x="8824.12" y="10839.29" width="3593.43" height="1127.78"/>
+  <!-- Ekpansi Green Area -->
+  <rect class="room-bg-alt" x="5657.87" y="5748.6" width="6778.33" height="1945.77"/>
+  <!-- Lines and Dashes -->
+  <line class="line-white" x1="16840.62" y1="26329.79" x2="16840.62" y2="28076.52"/>
+  <!-- Dashed Lines -->
+  <rect class="dash-white" x="11198.9" y="18467.76" width="1029.8" height="130.14"/>
+  <rect class="dash-white" transform="matrix(2.08898E-14 0.608177 -1 2.04212E-14 10962.5 18770.5)" width="1150.94" height="130.14"/>
+  <rect class="dash-white" x="15978.93" y="20264.14" width="899.97" height="130.14"/>
+  <rect class="dash-white" x="19417.29" y="20264.14" width="899.97" height="130.14"/>
+  <rect class="dash-white" x="14692.87" y="22552.33" width="899.97" height="130.14"/>
+  <rect class="dash-white" transform="matrix(2.07094E-14 0.781942 -1 2.64845E-14 19352 22591)" width="1150.94" height="130.14"/>
+  <rect class="dash-white" transform="matrix(2.07094E-14 0.781942 -1 2.64845E-14 19352 25041.5)" width="1150.94" height="130.14"/>
+  <rect class="dash-white" x="17238.98" y="26275.21" width="1407.85" height="130.14"/>
+  <rect class="dash-white" x="12919.73" y="26275.21" width="1446.79" height="130.14"/>
+  <rect class="dash-white" x="7714.53" y="24815.47" width="899.97" height="130.14"/>
+  <rect class="dash-white" x="12664.34" y="31264.54" width="1087.55" height="130.14"/>
+  <rect class="dash-white" x="17062.26" y="31264.54" width="1506.02" height="130.14"/>
+  <rect class="dash-white" x="20897.64" y="31264.54" width="1199.95" height="130.14"/>
+  <rect class="dash-white" transform="matrix(2.08898E-14 0.928852 -1 3.11887E-14 12509.9 22748.7)" width="1150.94" height="130.14"/>
+  <rect class="dash-white" transform="matrix(2.08898E-14 0.928852 -1 3.11887E-14 12509.9 26780)" width="1150.94" height="130.14"/>
+  <rect class="dash-white" transform="matrix(2.08898E-14 0.608177 -1 2.04212E-14 8184.43 13444.1)" width="1150.94" height="130.14"/>
+  <rect class="dash-white" transform="matrix(2.08898E-14 0.608177 -1 2.04212E-14 7322.36 10822)" width="1150.94" height="130.14"/>
+  <rect class="dash-white" x="6513.03" y="10583.93" width="528.92" height="130.14"/>
+  <rect class="dash-white" x="8346.8" y="8927.49" width="829.12" height="130.14"/>
+  <rect class="room-bg" x="8119.55" y="14329.43" width="4325.32" height="3148.09"/>
+  <rect class="dash-white" transform="matrix(2.08898E-14 0.788754 -1 2.64845E-14 12454.3 15018.7)" width="1150.94" height="130.14"/>
+  <rect class="dash-white" transform="matrix(2.08898E-14 0.720812 -1 2.42032E-14 6624.71 17518.6)" width="1150.94" height="130.14"/>
+  <rect class="dash-white" x="11145.51" y="17412.46" width="1041.69" height="130.14"/>
+  <rect class="dash-white" x="14139.21" y="28051.37" width="899.97" height="130.14"/>
+  <rect class="dash-white" x="7472.14" y="7629.3" width="528.92" height="130.14"/>
+  <!-- Rounded Rect for Dapur -->
+  <rect class="line-white" x="6692.06" y="14480.85" width="1250.87" height="714.78" rx="80.41" ry="80.41"/>
+  <!-- Text Labels -->
+  <text x="9535.38" y="15967.24" class="text-white">Dapur</text>
+  <text x="7834.71" y="19488.46" class="text-white-sora">Kamar</text>
+  <text x="7834.71" y="22529.47" class="text-white">Kitchen</text>
+  <text x="13311.96" y="20526.82" class="text-white-sora">Kamar</text>
+  <text x="16448.83" y="19497.09" class="text-white-sora">Ruang</text>
+  <text x="19774.15" y="19497.09" class="text-white-sora">Gudang</text>
+  <text x="19774.15" y="22466.63" class="text-white-sora">Kamar</text>
+  <text x="19776.06" y="25108.43" class="text-white">kamar</text>
+  <text x="16626.63" y="23120.08" class="text-white">Family</text>
+  <text x="14519.8" y="29765.28" class="text-white">Kamar</text>
+  <text x="18837.51" y="28968.05" class="text-white">Ruang</text>
+  <text x="20217.31" y="34288.54" class="text-white">Garasi</text>
+  <text x="13397.32" y="33126.84" class="text-white-sora">Teras</text>
+  <text x="10243.66" y="11452.44" class="text-white">Aviary</text>
+  <text x="9349.29" y="9944.97" class="text-white-sora">Work</text>
+  <text x="6720.84" y="8359.49" class="text-white">Apotek</text>
+  <text x="20137.09" y="20863.23" class="text-white">Tempat</text>
+  <text x="8274" y="6721.49" class="text-white">Ekpansi</text>
+  <text x="7964.87" y="6956.8" class="text-white">Green</text>
+</svg>
             </div>
 
             <!-- SIDEBAR -->
