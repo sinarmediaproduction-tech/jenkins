@@ -111,22 +111,19 @@
             height: 100%;
             border-radius: 18px;
             overflow: hidden;
-            background: #0d1422;
-            box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04);
+            background: #0a0e17;
         }
 
-        .floorplan-container img {
+        .floorplan-container svg {
             width: 100%;
             height: 100%;
-            object-fit: contain;
             display: block;
-            opacity: 0.85;
+            opacity: 0.72;
             transition: opacity 0.3s;
         }
 
-        .floorplan-container:hover img,
         .floorplan-container:hover svg {
-            opacity: 1;
+            opacity: 0.92;
         }
 
         /* Fallback tampil saat gambar denah gagal dimuat */
@@ -472,21 +469,20 @@
             <!-- FLOORPLAN -->
             <div class="floorplan-container" id="floorplan">
                 <!-- Denah rumah SVG (inline) -->
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28233.56 40606.29" width="100%" height="100%" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd; opacity:0.85; transition:opacity 0.3s;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28233.56 40606.29" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd;">
   <defs>
     <style>
-      .bg { fill: none; stroke: #FFFFFF; stroke-width: 17.64; }
-      .wall { fill: none; stroke: #FFFFFF; stroke-width: 20; }
-      .room-bg { fill: none; stroke: #FFFFFF; stroke-width: 17.64; }
-      .room-bg-alt { fill: none; stroke: #FFFFFF; stroke-width: 17.64; }
-      .text-white { fill: #FFFFFF; font-family: 'Arial', sans-serif; font-weight: bold; font-size: 238.79px; }
-      .text-white-sora { fill: #FFFFFF; font-family: 'Sora', sans-serif; font-weight: bold; font-size: 238.79px; }
-      .line-white { fill: none; stroke: #FFFFFF; stroke-width: 20; }
-      .dash-white { fill: none; stroke: #CCCCCC; stroke-width: 130.14; }
+      .bg { fill: rgba(0,212,255,0.04); stroke: #4a7fa8; stroke-width: 17.64; }
+      .wall { fill: none; stroke: #5592b8; stroke-width: 20; }
+      .room-bg { fill: rgba(0,150,255,0.04); stroke: #3d6e96; stroke-width: 17.64; }
+      .room-bg-alt { fill: rgba(0,255,136,0.04); stroke: #3d8a6e; stroke-width: 17.64; }
+      .text-white { fill: #8ab4cc; font-family: 'Arial', sans-serif; font-weight: bold; font-size: 238.79px; }
+      .text-white-sora { fill: #8ab4cc; font-family: 'Sora', sans-serif; font-weight: bold; font-size: 238.79px; }
+      .line-white { fill: none; stroke: #4a7fa8; stroke-width: 20; }
+      .dash-white { fill: none; stroke: #2a4a6a; stroke-width: 130.14; }
     </style>
   </defs>
-  <!-- Outer Border -->
-  <rect class="wall" x="10" y="9.99" width="28213.56" height="40586.29"/>
+  <!-- Outer Border removed for seamless integration -->
   <!-- Main Background Shape -->
   <polygon class="bg" points="13411.48,3444.07 4721.63,4468.75 4721.63,14435.26 5512.1,14435.26 5512.1,26099.66 11230.1,26099.66 11230.1,37413.3 23374.36,37413.3 23374.36,17870.17 13411.48,17870.17 "/>
   <!-- Inner Background Shape -->
