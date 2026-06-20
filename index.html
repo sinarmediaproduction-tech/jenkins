@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏠 Home Monitoring Dashboard</title>
+    <title>🏠 Home Monitoring Dashboard - Demo</title>
     <style>
         /* ==================== RESET & GLOBAL ==================== */
         * {
@@ -43,6 +43,8 @@
             align-items: center;
             padding-bottom: clamp(10px, 1vw, 16px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .dashboard-header h1 {
@@ -60,6 +62,7 @@
             display: flex;
             align-items: center;
             gap: clamp(16px, 2vw, 36px);
+            flex-wrap: wrap;
         }
 
         .clock {
@@ -96,7 +99,7 @@
             50% { opacity: 0.3; }
         }
 
-        /* ==================== MAIN CONTENT: FLOORPLAN + SIDEBAR ==================== */
+        /* ==================== MAIN CONTENT ==================== */
         .main-content {
             display: grid;
             grid-template-columns: 1fr minmax(240px, 17vw);
@@ -121,10 +124,8 @@
             inset: 0;
             z-index: 0;
             background-image:
-                /* Grid utama 10% */
                 linear-gradient(rgba(0, 212, 255, 0.08) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 212, 255, 0.08) 1px, transparent 1px),
-                /* Sub-grid 2% */
                 linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
             background-size:
@@ -138,7 +139,6 @@
             pointer-events: none;
         }
 
-        /* Label koordinat di grid */
         .grid-coords {
             position: absolute;
             inset: 0;
@@ -154,13 +154,11 @@
             transform: translateX(-50%);
             top: 4px;
         }
-
         .grid-coords .y-label {
             position: absolute;
             transform: translateY(-50%);
             left: 4px;
         }
-
         .grid-coords .x-label:nth-child(1) { left: 5%; }
         .grid-coords .x-label:nth-child(2) { left: 15%; }
         .grid-coords .x-label:nth-child(3) { left: 25%; }
@@ -171,7 +169,6 @@
         .grid-coords .x-label:nth-child(8) { left: 75%; }
         .grid-coords .x-label:nth-child(9) { left: 85%; }
         .grid-coords .x-label:nth-child(10) { left: 95%; }
-
         .grid-coords .y-label:nth-child(11) { top: 5%; }
         .grid-coords .y-label:nth-child(12) { top: 15%; }
         .grid-coords .y-label:nth-child(13) { top: 25%; }
@@ -193,7 +190,6 @@
             opacity: 0.72;
             transition: opacity 0.3s;
         }
-
         .floorplan-container:hover svg {
             opacity: 0.92;
         }
@@ -246,7 +242,6 @@
             bottom: calc(100% + 16px);
         }
 
-        /* Koordinat di samping sensor (debug) */
         .sensor-coord {
             position: absolute;
             z-index: 9;
@@ -261,53 +256,42 @@
             white-space: nowrap;
         }
 
-        /* ==================== STATUS SENSOR ==================== */
         .sensor-dot.idle {
             background: #1a5a3a;
             border-color: rgba(0, 255, 136, 0.3);
             box-shadow: 0 0 15px rgba(0, 255, 136, 0.1);
         }
-
         .sensor-dot.idle::before {
             border-color: rgba(0, 255, 136, 0.05);
         }
-
         .sensor-dot.active {
             background: #ff3344;
             border-color: rgba(255, 51, 68, 0.8);
             animation: pulse-wave 1.8s ease-out infinite;
             box-shadow: 0 0 40px rgba(255, 51, 68, 0.4);
         }
-
         .sensor-dot.active::before {
             border-color: rgba(255, 51, 68, 0.3);
             animation: pulse-ring 1.8s ease-out infinite;
         }
-
-        @keyframes pulse-wave {
-            0% {
-                transform: translate(-50%, -50%) scale(1);
-                box-shadow: 0 0 20px rgba(255, 51, 68, 0.5);
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.3);
-                box-shadow: 0 0 50px rgba(255, 51, 68, 0.7);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                box-shadow: 0 0 20px rgba(255, 51, 68, 0.5);
-            }
+        .sensor-dot.offline {
+            background: #333;
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: none;
+            opacity: 0.4;
+        }
+        .sensor-dot.offline::before {
+            display: none;
         }
 
+        @keyframes pulse-wave {
+            0% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 20px rgba(255, 51, 68, 0.5); }
+            50% { transform: translate(-50%, -50%) scale(1.3); box-shadow: 0 0 50px rgba(255, 51, 68, 0.7); }
+            100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 20px rgba(255, 51, 68, 0.5); }
+        }
         @keyframes pulse-ring {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(2.5);
-                opacity: 0;
-            }
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
         }
 
         /* ==================== SIDEBAR ==================== */
@@ -343,7 +327,6 @@
             font-weight: 700;
         }
 
-        /* --- Sensor list panel --- */
         .sensor-list-panel {
             overflow: hidden;
             display: flex;
@@ -361,7 +344,6 @@
         .sensor-list::-webkit-scrollbar {
             width: 5px;
         }
-
         .sensor-list::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.08);
             border-radius: 10px;
@@ -382,6 +364,10 @@
             background: rgba(255, 51, 68, 0.08);
             border-color: rgba(255, 51, 68, 0.25);
         }
+        .sensor-row.is-offline {
+            opacity: 0.4;
+            border-color: rgba(255, 255, 255, 0.02);
+        }
 
         .sensor-row-dot {
             width: 9px;
@@ -392,11 +378,14 @@
             flex-shrink: 0;
             transition: all 0.3s;
         }
-
         .sensor-row.is-active .sensor-row-dot {
             background: #ff3344;
             box-shadow: 0 0 10px rgba(255, 51, 68, 0.7);
             animation: pulse-wave 1.8s ease-out infinite;
+        }
+        .sensor-row.is-offline .sensor-row-dot {
+            background: #444;
+            box-shadow: none;
         }
 
         .sensor-row-name {
@@ -404,25 +393,25 @@
             color: #c5cfe0;
             flex: 1;
         }
-
         .sensor-row-status {
             font-size: clamp(10px, 0.75vw, 12px);
             color: #4a8a5a;
             font-weight: 600;
             transition: all 0.3s;
         }
-
         .sensor-row.is-active .sensor-row-status {
             color: #ff6677;
         }
-
+        .sensor-row.is-offline .sensor-row-status {
+            color: #555;
+        }
         .sensor-row-coord {
             font-size: clamp(8px, 0.6vw, 10px);
             color: #44557a;
             font-family: 'Courier New', monospace;
         }
 
-        /* --- Legend panel --- */
+        /* ==================== LEGEND ==================== */
         .legend {
             display: flex;
             flex-direction: column;
@@ -430,99 +419,95 @@
             font-size: clamp(11px, 0.85vw, 13px);
             color: #8899bb;
         }
-
         .legend-item {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-
         .legend-color {
             width: 12px;
             height: 12px;
             border-radius: 50%;
             flex-shrink: 0;
         }
-
         .legend-color.idle-color {
             background: #1a5a3a;
             border: 1px solid rgba(0, 255, 136, 0.3);
         }
-
         .legend-color.active-color {
             background: #ff3344;
             border: 1px solid rgba(255, 51, 68, 0.5);
             animation: pulse-wave 1.8s ease-out infinite;
         }
-
-        /* --- Log panel --- */
-        .log-panel {
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+        .legend-color.offline-color {
+            background: #444;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
+        /* ==================== LOG ==================== */
         .log-area {
             color: #6a7a9a;
             font-size: clamp(11px, 0.85vw, 13px);
             font-family: 'Courier New', monospace;
             line-height: 1.6;
             min-height: 40px;
+            max-height: 200px;
+            overflow-y: auto;
         }
-
         .log-area .log-entry {
             display: block;
             padding: 2px 0;
             border-bottom: 1px solid rgba(255,255,255,0.03);
         }
+        .log-area .log-entry .time { color: #44557a; }
+        .log-area .log-entry .sensor-name { color: #00d4ff; }
+        .log-area .log-entry .status-ok { color: #4a8a5a; }
+        .log-area .log-entry .status-motion { color: #ff6677; }
+        .log-area .log-entry .status-offline { color: #555; }
 
-        .log-area .log-entry .time {
-            color: #44557a;
+        /* ==================== CONTROL PANEL ==================== */
+        .control-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 6px;
         }
 
-        .log-area .log-entry .sensor-name {
+        .btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #8899bb;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: clamp(10px, 0.7vw, 12px);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.2);
             color: #00d4ff;
         }
-
-        .log-area .log-entry .status-ok {
-            color: #4a8a5a;
-        }
-
-        .log-area .log-entry .status-motion {
+        .btn-danger:hover {
+            background: rgba(255, 51, 68, 0.15);
+            border-color: rgba(255, 51, 68, 0.3);
             color: #ff6677;
         }
-
-        /* ==================== RESPONSIVE ==================== */
-        @media (max-width: 900px) {
-            html, body {
-                overflow: auto;
-            }
-
-            .dashboard {
-                height: auto;
-                min-height: 100vh;
-            }
-
-            .main-content {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto auto;
-            }
-
-            .floorplan-container {
-                aspect-ratio: 28233.56 / 40606.29;
-                min-height: 50vh;
-            }
-
-            .sidebar {
-                position: static;
-            }
-
-            .sensor-list {
-                max-height: 200px;
-            }
+        .btn-success:hover {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: rgba(0, 255, 136, 0.2);
+            color: #4a8a5a;
+        }
+        .btn-primary {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.15);
+            color: #00d4ff;
+        }
+        .btn-primary:hover {
+            background: rgba(0, 212, 255, 0.2);
         }
 
-        /* ==================== TOGGLE GRID ==================== */
         .toggle-grid {
             position: absolute;
             z-index: 20;
@@ -539,20 +524,31 @@
             transition: all 0.3s;
             font-family: 'Segoe UI', sans-serif;
         }
-
         .toggle-grid:hover {
             background: rgba(0, 212, 255, 0.15);
             border-color: rgba(0, 212, 255, 0.3);
             color: #00d4ff;
         }
-
-        .toggle-grid .icon {
-            margin-right: 6px;
-        }
-
+        .toggle-grid .icon { margin-right: 6px; }
         .grid-hidden .grid-bg,
-        .grid-hidden .grid-coords {
-            display: none !important;
+        .grid-hidden .grid-coords { display: none !important; }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto;
+            }
+            .floorplan-container {
+                aspect-ratio: 28233.56 / 40606.29;
+                min-height: 50vh;
+            }
+            .sidebar {
+                position: static;
+            }
+            .sensor-list {
+                max-height: 200px;
+            }
         }
     </style>
 </head>
@@ -568,6 +564,9 @@
                     <span class="status-dot"></span>
                     <span>Sistem Aktif</span>
                 </div>
+                <span style="color:#44557a;font-size:clamp(10px,0.7vw,12px);">
+                    🟢 <span id="deviceCount">0</span> perangkat
+                </span>
             </div>
         </div>
 
@@ -577,253 +576,114 @@
             <!-- FLOORPLAN -->
             <div class="floorplan-container" id="floorplan">
 
-                <!-- ======== GRID BACKGROUND ======== -->
+                <!-- Grid -->
                 <div class="grid-bg"></div>
-
-                <!-- ======== GRID COORDINATES LABELS ======== -->
                 <div class="grid-coords">
-                    <!-- X labels (top) -->
-                    <span class="x-label">0%</span>
-                    <span class="x-label">10%</span>
-                    <span class="x-label">20%</span>
-                    <span class="x-label">30%</span>
-                    <span class="x-label">40%</span>
-                    <span class="x-label">50%</span>
-                    <span class="x-label">60%</span>
-                    <span class="x-label">70%</span>
-                    <span class="x-label">80%</span>
-                    <span class="x-label">90%</span>
-                    <!-- Y labels (left) -->
-                    <span class="y-label">0%</span>
-                    <span class="y-label">10%</span>
-                    <span class="y-label">20%</span>
-                    <span class="y-label">30%</span>
-                    <span class="y-label">40%</span>
-                    <span class="y-label">50%</span>
-                    <span class="y-label">60%</span>
-                    <span class="y-label">70%</span>
-                    <span class="y-label">80%</span>
-                    <span class="y-label">90%</span>
+                    <span class="x-label">0%</span><span class="x-label">10%</span>
+                    <span class="x-label">20%</span><span class="x-label">30%</span>
+                    <span class="x-label">40%</span><span class="x-label">50%</span>
+                    <span class="x-label">60%</span><span class="x-label">70%</span>
+                    <span class="x-label">80%</span><span class="x-label">90%</span>
+                    <span class="y-label">0%</span><span class="y-label">10%</span>
+                    <span class="y-label">20%</span><span class="y-label">30%</span>
+                    <span class="y-label">40%</span><span class="y-label">50%</span>
+                    <span class="y-label">60%</span><span class="y-label">70%</span>
+                    <span class="y-label">80%</span><span class="y-label">90%</span>
                 </div>
 
-                <!-- ======== TOGGLE GRID BUTTON ======== -->
                 <button class="toggle-grid" id="toggleGrid" onclick="toggleGrid()">
                     <span class="icon">▦</span> Sembunyikan Grid
                 </button>
 
-                <!-- ======== SVG DENAH ======== -->
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28233.56 40606.29" width="100%" height="100%" preserveAspectRatio="xMidYMin meet" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd;">
-  <defs>
-    <style>
-      .bg { fill: rgba(0,212,255,0.04); stroke: #4a7fa8; stroke-width: 17.64; }
-      .wall { fill: none; stroke: #5592b8; stroke-width: 20; }
-      .room-bg { fill: rgba(0,150,255,0.04); stroke: #3d6e96; stroke-width: 17.64; }
-      .room-bg-alt { fill: rgba(0,255,136,0.04); stroke: #3d8a6e; stroke-width: 17.64; }
-      .text-white { fill: #8ab4cc; font-family: 'Arial', sans-serif; font-weight: bold; font-size: 238.79px; }
-      .text-white-sora { fill: #8ab4cc; font-family: 'Sora', sans-serif; font-weight: bold; font-size: 238.79px; }
-      .line-white { fill: none; stroke: #4a7fa8; stroke-width: 20; }
-      .dash-white { fill: none; stroke: #2a4a6a; stroke-width: 130.14; }
-    </style>
-  </defs>
-  <!-- Outer wall -->
-  <polygon class="bg" points="13285.93,3318.53 4596.09,4343.21 4596.09,14309.71 5386.56,14309.71 5386.56,25974.11 11104.55,25974.11 11104.55,37287.75 23248.82,37287.75 23248.82,17744.62 13285.93,17744.62 "/>
-  <!-- Top Area Rooms -->
-  <rect class="room-bg" x="12444.86" y="20329.21" width="9999.62" height="5999.77"/>
-  <rect class="room-bg" x="12444.86" y="26329.79" width="9999.62" height="4999.81"/>
-  <rect class="room-bg" x="12444.86" y="18528.62" width="9999.62" height="1799.93"/>
-  <!-- Left Area Rooms -->
-  <rect class="room-bg" x="6559.65" y="18522.48" width="5885.22" height="6358.06"/>
-  <rect class="room-bg" x="6559.65" y="14329.43" width="5885.22" height="4193.04"/>
-  <rect class="room-bg" x="6559.64" y="18522.48" width="4343.25" height="1815.79"/>
-  <!-- Complex Room Shapes -->
-  <polygon class="room-bg" points="10902.89,20338.27 6559.64,20338.27 6559.64,24880.54 7430.56,24880.54 7430.56,21188.21 10031.98,21188.21 10031.98,22774.91 10902.89,22774.91 "/>
-  <rect class="room-bg" x="8959.77" y="23912.54" width="2601.42" height="967.99"/>
-  <rect class="room-bg" x="19286.96" y="23770.46" width="3157.53" height="2558.52"/>
-  <rect class="room-bg" x="19286.96" y="21211.93" width="3157.53" height="2558.52"/>
-  <rect class="room-bg" x="19112.62" y="18528.62" width="3331.87" height="1800.58"/>
-  <rect class="room-bg" x="15780.75" y="18528.62" width="3331.87" height="1800.58"/>
-  <rect class="room-bg" x="8119.37" y="12853.22" width="4325.5" height="1476.21"/>
-  <rect class="room-bg" x="7257.28" y="8992.56" width="5164.71" height="2984.91"/>
-  <rect class="room-bg-alt" x="5434.11" y="8992.56" width="1140.15" height="4189.13"/>
-  <rect class="room-bg" x="5664.16" y="8992.56" width="1593.13" height="2984.91"/>
-  <rect class="room-bg" x="5664.16" y="8992.56" width="1593.13" height="1678.27"/>
-  <rect class="room-bg" x="5661.9" y="7694.37" width="6760.1" height="1298.19"/>
-  <rect class="room-bg" x="5661.9" y="7694.37" width="4149.4" height="1298.19"/>
-  <!-- Another Complex Room -->
-  <polygon class="room-bg" points="15925.87,33554.02 19444.59,33554.02 19444.59,37076.51 22444.49,37076.51 22444.49,33554.02 22444.49,31867.63 22444.49,31329.6 12444.86,31329.6 12444.86,33554.02 12444.86,34889.16 15925.87,34889.16 "/>
-  <rect class="room-bg-alt" x="5720.88" y="13859.79" width="956.9" height="464.19"/>
-  <rect class="room-bg" x="12448.88" y="18528.62" width="3331.87" height="4088.78"/>
-  <!-- Garage Area -->
-  <rect class="room-bg" x="13840.74" y="28120.02" width="2999.89" height="3203.37"/>
-  <rect class="room-bg" x="8824.12" y="10839.29" width="3593.43" height="1127.78"/>
-  <!-- Ekpansi Green Area -->
-  <rect class="room-bg-alt" x="5657.87" y="5748.6" width="6778.33" height="1945.77"/>
-  <!-- Lines and Dashes -->
-  <line class="line-white" x1="16840.62" y1="26329.79" x2="16840.62" y2="28076.52"/>
-  <!-- Dashed Lines -->
-  <rect class="dash-white" x="11198.9" y="18467.76" width="1029.8" height="130.14"/>
-  <rect class="dash-white" transform="matrix(2.08898E-14 0.608177 -1 2.04212E-14 10962.5 18770.5)" width="1150.94" height="130.14"/>
-  <rect class="dash-white" x="15978.93" y="20264.14" width="899.97" height="130.14"/>
-  <rect class="dash-white" x="19417.29" y="20264.14" width="899.97" height="130.14"/>
-  <rect class="dash-white" x="14692.87" y="22552.33" width="899.97" height="130.14"/>
-  <rect class="dash-white" transform="matrix(2.07094E-14 0.781942 -1 2.64845E-14 19352 22591)" width="1150.94" height="130.14"/>
-  <rect class="dash-white" transform="matrix(2.07094E-14 0.781942 -1 2.64845E-14 19352 25041.5)" width="1150.94" height="130.14"/>
-  <rect class="dash-white" x="17238.98" y="26275.21" width="1407.85" height="130.14"/>
-  <rect class="dash-white" x="12919.73" y="26275.21" width="1446.79" height="130.14"/>
-  <rect class="dash-white" x="7714.53" y="24815.47" width="899.97" height="130.14"/>
-  <rect class="dash-white" x="12664.34" y="31264.54" width="1087.55" height="130.14"/>
-  <rect class="dash-white" x="17062.26" y="31264.54" width="1506.02" height="130.14"/>
-  <rect class="dash-white" x="20897.64" y="31264.54" width="1199.95" height="130.14"/>
-  <rect class="dash-white" transform="matrix(2.08898E-14 0.928852 -1 3.11887E-14 12509.9 22748.7)" width="1150.94" height="130.14"/>
-  <rect class="dash-white" transform="matrix(2.08898E-14 0.928852 -1 3.11887E-14 12509.9 26780)" width="1150.94" height="130.14"/>
-  <rect class="dash-white" transform="matrix(2.08898E-14 0.608177 -1 2.04212E-14 8184.43 13444.1)" width="1150.94" height="130.14"/>
-  <rect class="dash-white" transform="matrix(2.08898E-14 0.608177 -1 2.04212E-14 7322.36 10822)" width="1150.94" height="130.14"/>
-  <rect class="dash-white" x="6513.03" y="10583.93" width="528.92" height="130.14"/>
-  <rect class="dash-white" x="8346.8" y="8927.49" width="829.12" height="130.14"/>
-  <rect class="room-bg" x="8119.55" y="14329.43" width="4325.32" height="3148.09"/>
-  <rect class="dash-white" transform="matrix(2.08898E-14 0.788754 -1 2.64845E-14 12454.3 15018.7)" width="1150.94" height="130.14"/>
-  <rect class="dash-white" transform="matrix(2.08898E-14 0.720812 -1 2.42032E-14 6624.71 17518.6)" width="1150.94" height="130.14"/>
-  <rect class="dash-white" x="11145.51" y="17412.46" width="1041.69" height="130.14"/>
-  <rect class="dash-white" x="14139.21" y="28051.37" width="899.97" height="130.14"/>
-  <rect class="dash-white" x="7472.14" y="7629.3" width="528.92" height="130.14"/>
-  <!-- Rounded Rect for Dapur -->
-  <rect class="line-white" x="6692.06" y="14480.85" width="1250.87" height="714.78" rx="80.41" ry="80.41"/>
-  <!-- Text Labels -->
-  <text x="9535.38" y="15967.24" class="text-white">Dapur</text>
-  <text x="7834.71" y="19488.46" class="text-white-sora">Kamar</text>
-  <text x="7834.71" y="22529.47" class="text-white">Kitchen</text>
-  <text x="13311.96" y="20526.82" class="text-white-sora">Kamar</text>
-  <text x="16448.83" y="19497.09" class="text-white-sora">Ruang</text>
-  <text x="19774.15" y="19497.09" class="text-white-sora">Gudang</text>
-  <text x="19774.15" y="22466.63" class="text-white-sora">Kamar</text>
-  <text x="19776.06" y="25108.43" class="text-white">kamar</text>
-  <text x="16626.63" y="23120.08" class="text-white">Family</text>
-  <text x="14519.8" y="29765.28" class="text-white">Kamar</text>
-  <text x="18837.51" y="28968.05" class="text-white">Ruang</text>
-  <text x="20217.31" y="34288.54" class="text-white">Garasi</text>
-  <text x="13397.32" y="33126.84" class="text-white-sora">Teras</text>
-  <text x="10243.66" y="11452.44" class="text-white">Aviary</text>
-  <text x="9349.29" y="9944.97" class="text-white-sora">Work</text>
-  <text x="6720.84" y="8359.49" class="text-white">Apotek</text>
-  <text x="20137.09" y="20863.23" class="text-white">Tempat</text>
-  <text x="8274" y="6721.49" class="text-white">Ekpansi</text>
-  <text x="7964.87" y="6956.8" class="text-white">Green</text>
-</svg>
+                <!-- SVG DENAH -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28233.56 40606.29" width="100%" height="100%" preserveAspectRatio="xMidYMin meet">
+                    <defs>
+                        <style>
+                            .bg { fill: rgba(0,212,255,0.04); stroke: #4a7fa8; stroke-width: 17.64; }
+                            .room-bg { fill: rgba(0,150,255,0.04); stroke: #3d6e96; stroke-width: 17.64; }
+                            .room-bg-alt { fill: rgba(0,255,136,0.04); stroke: #3d8a6e; stroke-width: 17.64; }
+                            .text-white { fill: #8ab4cc; font-family: 'Arial', sans-serif; font-weight: bold; font-size: 238.79px; }
+                            .text-white-sora { fill: #8ab4cc; font-family: 'Sora', sans-serif; font-weight: bold; font-size: 238.79px; }
+                            .line-white { fill: none; stroke: #4a7fa8; stroke-width: 20; }
+                            .dash-white { fill: none; stroke: #2a4a6a; stroke-width: 130.14; }
+                        </style>
+                    </defs>
+                    <polygon class="bg" points="13285.93,3318.53 4596.09,4343.21 4596.09,14309.71 5386.56,14309.71 5386.56,25974.11 11104.55,25974.11 11104.55,37287.75 23248.82,37287.75 23248.82,17744.62 13285.93,17744.62 "/>
+                    <rect class="room-bg" x="12444.86" y="20329.21" width="9999.62" height="5999.77"/>
+                    <rect class="room-bg" x="12444.86" y="26329.79" width="9999.62" height="4999.81"/>
+                    <rect class="room-bg" x="12444.86" y="18528.62" width="9999.62" height="1799.93"/>
+                    <rect class="room-bg" x="6559.65" y="18522.48" width="5885.22" height="6358.06"/>
+                    <rect class="room-bg" x="6559.65" y="14329.43" width="5885.22" height="4193.04"/>
+                    <rect class="room-bg" x="6559.64" y="18522.48" width="4343.25" height="1815.79"/>
+                    <polygon class="room-bg" points="10902.89,20338.27 6559.64,20338.27 6559.64,24880.54 7430.56,24880.54 7430.56,21188.21 10031.98,21188.21 10031.98,22774.91 10902.89,22774.91 "/>
+                    <rect class="room-bg" x="8959.77" y="23912.54" width="2601.42" height="967.99"/>
+                    <rect class="room-bg" x="19286.96" y="23770.46" width="3157.53" height="2558.52"/>
+                    <rect class="room-bg" x="19286.96" y="21211.93" width="3157.53" height="2558.52"/>
+                    <rect class="room-bg" x="19112.62" y="18528.62" width="3331.87" height="1800.58"/>
+                    <rect class="room-bg" x="15780.75" y="18528.62" width="3331.87" height="1800.58"/>
+                    <rect class="room-bg" x="8119.37" y="12853.22" width="4325.5" height="1476.21"/>
+                    <rect class="room-bg" x="7257.28" y="8992.56" width="5164.71" height="2984.91"/>
+                    <rect class="room-bg-alt" x="5434.11" y="8992.56" width="1140.15" height="4189.13"/>
+                    <rect class="room-bg" x="5664.16" y="8992.56" width="1593.13" height="2984.91"/>
+                    <rect class="room-bg" x="5664.16" y="8992.56" width="1593.13" height="1678.27"/>
+                    <rect class="room-bg" x="5661.9" y="7694.37" width="6760.1" height="1298.19"/>
+                    <rect class="room-bg" x="5661.9" y="7694.37" width="4149.4" height="1298.19"/>
+                    <polygon class="room-bg" points="15925.87,33554.02 19444.59,33554.02 19444.59,37076.51 22444.49,37076.51 22444.49,33554.02 22444.49,31867.63 22444.49,31329.6 12444.86,31329.6 12444.86,33554.02 12444.86,34889.16 15925.87,34889.16 "/>
+                    <rect class="room-bg-alt" x="5720.88" y="13859.79" width="956.9" height="464.19"/>
+                    <rect class="room-bg" x="12448.88" y="18528.62" width="3331.87" height="4088.78"/>
+                    <rect class="room-bg" x="13840.74" y="28120.02" width="2999.89" height="3203.37"/>
+                    <rect class="room-bg" x="8824.12" y="10839.29" width="3593.43" height="1127.78"/>
+                    <rect class="room-bg-alt" x="5657.87" y="5748.6" width="6778.33" height="1945.77"/>
+                    <line class="line-white" x1="16840.62" y1="26329.79" x2="16840.62" y2="28076.52"/>
+                    <rect class="dash-white" x="11198.9" y="18467.76" width="1029.8" height="130.14"/>
+                    <rect class="dash-white" transform="matrix(2.08898E-14 0.608177 -1 2.04212E-14 10962.5 18770.5)" width="1150.94" height="130.14"/>
+                    <rect class="dash-white" x="15978.93" y="20264.14" width="899.97" height="130.14"/>
+                    <rect class="dash-white" x="19417.29" y="20264.14" width="899.97" height="130.14"/>
+                    <rect class="dash-white" x="14692.87" y="22552.33" width="899.97" height="130.14"/>
+                    <rect class="dash-white" transform="matrix(2.07094E-14 0.781942 -1 2.64845E-14 19352 22591)" width="1150.94" height="130.14"/>
+                    <rect class="dash-white" transform="matrix(2.07094E-14 0.781942 -1 2.64845E-14 19352 25041.5)" width="1150.94" height="130.14"/>
+                    <rect class="dash-white" x="17238.98" y="26275.21" width="1407.85" height="130.14"/>
+                    <rect class="dash-white" x="12919.73" y="26275.21" width="1446.79" height="130.14"/>
+                    <rect class="dash-white" x="7714.53" y="24815.47" width="899.97" height="130.14"/>
+                    <rect class="dash-white" x="12664.34" y="31264.54" width="1087.55" height="130.14"/>
+                    <rect class="dash-white" x="17062.26" y="31264.54" width="1506.02" height="130.14"/>
+                    <rect class="dash-white" x="20897.64" y="31264.54" width="1199.95" height="130.14"/>
+                    <rect class="dash-white" transform="matrix(2.08898E-14 0.928852 -1 3.11887E-14 12509.9 22748.7)" width="1150.94" height="130.14"/>
+                    <rect class="dash-white" transform="matrix(2.08898E-14 0.928852 -1 3.11887E-14 12509.9 26780)" width="1150.94" height="130.14"/>
+                    <rect class="dash-white" transform="matrix(2.08898E-14 0.608177 -1 2.04212E-14 8184.43 13444.1)" width="1150.94" height="130.14"/>
+                    <rect class="dash-white" transform="matrix(2.08898E-14 0.608177 -1 2.04212E-14 7322.36 10822)" width="1150.94" height="130.14"/>
+                    <rect class="dash-white" x="6513.03" y="10583.93" width="528.92" height="130.14"/>
+                    <rect class="dash-white" x="8346.8" y="8927.49" width="829.12" height="130.14"/>
+                    <rect class="room-bg" x="8119.55" y="14329.43" width="4325.32" height="3148.09"/>
+                    <rect class="dash-white" transform="matrix(2.08898E-14 0.788754 -1 2.64845E-14 12454.3 15018.7)" width="1150.94" height="130.14"/>
+                    <rect class="dash-white" transform="matrix(2.08898E-14 0.720812 -1 2.42032E-14 6624.71 17518.6)" width="1150.94" height="130.14"/>
+                    <rect class="dash-white" x="11145.51" y="17412.46" width="1041.69" height="130.14"/>
+                    <rect class="dash-white" x="14139.21" y="28051.37" width="899.97" height="130.14"/>
+                    <rect class="dash-white" x="7472.14" y="7629.3" width="528.92" height="130.14"/>
+                    <rect class="line-white" x="6692.06" y="14480.85" width="1250.87" height="714.78" rx="80.41" ry="80.41"/>
+                    <text x="9535.38" y="15967.24" class="text-white">Dapur</text>
+                    <text x="7834.71" y="19488.46" class="text-white-sora">Kamar</text>
+                    <text x="7834.71" y="22529.47" class="text-white">Kitchen</text>
+                    <text x="13311.96" y="20526.82" class="text-white-sora">Kamar</text>
+                    <text x="16448.83" y="19497.09" class="text-white-sora">Ruang</text>
+                    <text x="19774.15" y="19497.09" class="text-white-sora">Gudang</text>
+                    <text x="19774.15" y="22466.63" class="text-white-sora">Kamar</text>
+                    <text x="19776.06" y="25108.43" class="text-white">kamar</text>
+                    <text x="16626.63" y="23120.08" class="text-white">Family</text>
+                    <text x="14519.8" y="29765.28" class="text-white">Kamar</text>
+                    <text x="18837.51" y="28968.05" class="text-white">Ruang</text>
+                    <text x="20217.31" y="34288.54" class="text-white">Garasi</text>
+                    <text x="13397.32" y="33126.84" class="text-white-sora">Teras</text>
+                    <text x="10243.66" y="11452.44" class="text-white">Aviary</text>
+                    <text x="9349.29" y="9944.97" class="text-white-sora">Work</text>
+                    <text x="6720.84" y="8359.49" class="text-white">Apotek</text>
+                    <text x="20137.09" y="20863.23" class="text-white">Tempat</text>
+                    <text x="8274" y="6721.49" class="text-white">Ekpansi</text>
+                    <text x="7964.87" y="6956.8" class="text-white">Green</text>
+                </svg>
 
-                <!-- ============================================================ -->
-                <!-- SENSOR DOT - Posisi di atas SVG (menggunakan CSS absolute)    -->
-                <!-- ============================================================ -->
-
-                <!-- == LANTAI 1 == -->
-                <!-- Dapur -->
-                <div class="sensor-dot idle" id="sensor-dapur" style="left: 13.5%; top: 39.5%;" data-room="Dapur" data-coord="13.5%, 39.5%">
-                    <span class="sensor-tooltip">Dapur</span>
-                    <span class="sensor-coord">13.5%, 39.5%</span>
-                </div>
-
-                <!-- Kamar Kiri 1 -->
-                <div class="sensor-dot idle" id="sensor-kamar-kiri1" style="left: 9.8%; top: 49%;" data-room="Kamar Kiri 1" data-coord="9.8%, 49%">
-                    <span class="sensor-tooltip">Kamar 1</span>
-                    <span class="sensor-coord">9.8%, 49%</span>
-                </div>
-
-                <!-- Kamar Kiri 2 -->
-                <div class="sensor-dot idle" id="sensor-kamar-kiri2" style="left: 10.2%; top: 56%;" data-room="Kamar Kiri 2" data-coord="10.2%, 56%">
-                    <span class="sensor-tooltip">Kamar 2</span>
-                    <span class="sensor-coord">10.2%, 56%</span>
-                </div>
-
-                <!-- Kitchen -->
-                <div class="sensor-dot idle" id="sensor-kitchen" style="left: 16.8%; top: 56.5%;" data-room="Kitchen" data-coord="16.8%, 56.5%">
-                    <span class="sensor-tooltip">Kitchen</span>
-                    <span class="sensor-coord">16.8%, 56.5%</span>
-                </div>
-
-                <!-- Ruang Tengah -->
-                <div class="sensor-dot idle" id="sensor-ruang" style="left: 20.5%; top: 49%;" data-room="Ruang" data-coord="20.5%, 49%">
-                    <span class="sensor-tooltip">Ruang</span>
-                    <span class="sensor-coord">20.5%, 49%</span>
-                </div>
-
-                <!-- Gudang -->
-                <div class="sensor-dot idle" id="sensor-gudang" style="left: 30.5%; top: 49%;" data-room="Gudang" data-coord="30.5%, 49%">
-                    <span class="sensor-tooltip">Gudang</span>
-                    <span class="sensor-coord">30.5%, 49%</span>
-                </div>
-
-                <!-- Family Room -->
-                <div class="sensor-dot idle" id="sensor-family" style="left: 25.5%; top: 58%;" data-room="Family" data-coord="25.5%, 58%">
-                    <span class="sensor-tooltip">Family</span>
-                    <span class="sensor-coord">25.5%, 58%</span>
-                </div>
-
-                <!-- Kamar Tengah -->
-                <div class="sensor-dot idle" id="sensor-kamar-tengah" style="left: 30.5%; top: 56.5%;" data-room="Kamar Tengah" data-coord="30.5%, 56.5%">
-                    <span class="sensor-tooltip">Kamar 3</span>
-                    <span class="sensor-coord">30.5%, 56.5%</span>
-                </div>
-
-                <!-- Kamar Atas -->
-                <div class="sensor-dot idle" id="sensor-kamar-atas" style="left: 38%; top: 49%;" data-room="Kamar Atas" data-coord="38%, 49%">
-                    <span class="sensor-tooltip">Kamar 4</span>
-                    <span class="sensor-coord">38%, 49%</span>
-                </div>
-
-                <!-- == LANTAI 2 (Garasi/Teras) == -->
-                <!-- Garasi -->
-                <div class="sensor-dot idle" id="sensor-garasi" style="left: 43%; top: 85%;" data-room="Garasi" data-coord="43%, 85%">
-                    <span class="sensor-tooltip">Garasi</span>
-                    <span class="sensor-coord">43%, 85%</span>
-                </div>
-
-                <!-- Teras -->
-                <div class="sensor-dot idle" id="sensor-teras" style="left: 27%; top: 82%;" data-room="Teras" data-coord="27%, 82%">
-                    <span class="sensor-tooltip">Teras</span>
-                    <span class="sensor-coord">27%, 82%</span>
-                </div>
-
-                <!-- Kamar Atas Garasi -->
-                <div class="sensor-dot idle" id="sensor-kamar-atas2" style="left: 32%; top: 73%;" data-room="Kamar Atas 2" data-coord="32%, 73%">
-                    <span class="sensor-tooltip">Kamar 5</span>
-                    <span class="sensor-coord">32%, 73%</span>
-                </div>
-
-                <!-- == AREA EKSTERIOR == -->
-                <!-- Aviary -->
-                <div class="sensor-dot idle" id="sensor-aviary" style="left: 16.5%; top: 29%;" data-room="Aviary" data-coord="16.5%, 29%">
-                    <span class="sensor-tooltip">Aviary</span>
-                    <span class="sensor-coord">16.5%, 29%</span>
-                </div>
-
-                <!-- Work -->
-                <div class="sensor-dot idle" id="sensor-work" style="left: 15.5%; top: 25%;" data-room="Work" data-coord="15.5%, 25%">
-                    <span class="sensor-tooltip">Work</span>
-                    <span class="sensor-coord">15.5%, 25%</span>
-                </div>
-
-                <!-- Apotek -->
-                <div class="sensor-dot idle" id="sensor-apotek" style="left: 11%; top: 22%;" data-room="Apotek" data-coord="11%, 22%">
-                    <span class="sensor-tooltip">Apotek</span>
-                    <span class="sensor-coord">11%, 22%</span>
-                </div>
-
-                <!-- Ekpansi Green -->
-                <div class="sensor-dot idle" id="sensor-ekpansi" style="left: 10%; top: 16%;" data-room="Ekpansi Green" data-coord="10%, 16%">
-                    <span class="sensor-tooltip">Ekpansi Green</span>
-                    <span class="sensor-coord">10%, 16%</span>
-                </div>
-
-                <!-- Tempat -->
-                <div class="sensor-dot idle" id="sensor-tempat" style="left: 38.5%; top: 52.5%;" data-room="Tempat" data-coord="38.5%, 52.5%">
-                    <span class="sensor-tooltip">Tempat</span>
-                    <span class="sensor-coord">38.5%, 52.5%</span>
-                </div>
-
-                <!-- Laundry (dari teks) -->
-                <div class="sensor-dot idle" id="sensor-laundry" style="left: 20%; top: 40%;" data-room="Laundry" data-coord="20%, 40%">
-                    <span class="sensor-tooltip">Laundry</span>
-                    <span class="sensor-coord">20%, 40%</span>
-                </div>
+                <!-- ===== SENSOR DOTS ===== -->
+                <!-- Akan di-generate oleh JavaScript berdasarkan data sensor -->
             </div>
 
             <!-- SIDEBAR -->
@@ -832,7 +692,7 @@
                 <!-- SENSOR LIST -->
                 <div class="panel sensor-list-panel">
                     <div class="panel-title">
-                        <span>Daftar Sensor</span>
+                        <span>Daftar Perangkat</span>
                         <span class="summary-count" id="activeCount">0 aktif</span>
                     </div>
                     <div class="sensor-list" id="sensorList"></div>
@@ -844,20 +704,40 @@
                     <div class="legend">
                         <div class="legend-item">
                             <span class="legend-color idle-color"></span>
-                            Aman
+                            Aman (Idle)
                         </div>
                         <div class="legend-item">
                             <span class="legend-color active-color"></span>
                             Gerakan Terdeteksi
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color offline-color"></span>
+                            Offline / Tidak Terpasang
                         </div>
                     </div>
                 </div>
 
                 <!-- LOG -->
                 <div class="panel log-panel">
-                    <div class="panel-title">Aktivitas Terakhir</div>
+                    <div class="panel-title">
+                        Aktivitas Terakhir
+                        <span style="font-weight:normal;text-transform:none;color:#44557a;font-size:clamp(9px,0.6vw,11px);">
+                            <span id="logCount">0</span> event
+                        </span>
+                    </div>
                     <div class="log-area" id="logArea">
-                        <span id="lastEvent">Menunggu koneksi ESP32...</span>
+                        <span style="color:#44557a;">🔄 Sistem siap...</span>
+                    </div>
+                </div>
+
+                <!-- CONTROL PANEL -->
+                <div class="panel">
+                    <div class="panel-title">Kontrol Demo</div>
+                    <div class="control-panel">
+                        <button class="btn btn-primary" onclick="addRandomDevice()">➕ Tambah Perangkat</button>
+                        <button class="btn btn-success" onclick="simulateRandomMotion()">🎯 Simulasi Gerakan</button>
+                        <button class="btn btn-danger" onclick="resetAllDevices()">🔄 Reset Semua</button>
+                        <button class="btn" onclick="toggleAutoDemo()">⏯️ Auto: <span id="autoStatus">ON</span></button>
                     </div>
                 </div>
 
@@ -867,112 +747,344 @@
 
     <script>
         // ================================================================
-        // DATA SENSOR
+        // DATA SENSOR - Ini adalah "database" perangkat yang terpasang
+        // Setiap perangkat memiliki koordinat grid (left%, top%)
         // ================================================================
-        const sensors = [
-            { id: 'sensor-dapur', name: 'Dapur' },
-            { id: 'sensor-kamar-kiri1', name: 'Kamar 1' },
-            { id: 'sensor-kamar-kiri2', name: 'Kamar 2' },
-            { id: 'sensor-kitchen', name: 'Kitchen' },
-            { id: 'sensor-ruang', name: 'Ruang' },
-            { id: 'sensor-gudang', name: 'Gudang' },
-            { id: 'sensor-family', name: 'Family' },
-            { id: 'sensor-kamar-tengah', name: 'Kamar 3' },
-            { id: 'sensor-kamar-atas', name: 'Kamar 4' },
-            { id: 'sensor-garasi', name: 'Garasi' },
-            { id: 'sensor-teras', name: 'Teras' },
-            { id: 'sensor-kamar-atas2', name: 'Kamar 5' },
-            { id: 'sensor-aviary', name: 'Aviary' },
-            { id: 'sensor-work', name: 'Work' },
-            { id: 'sensor-apotek', name: 'Apotek' },
-            { id: 'sensor-ekpansi', name: 'Ekpansi Green' },
-            { id: 'sensor-tempat', name: 'Tempat' },
-            { id: 'sensor-laundry', name: 'Laundry' }
+
+        // Daftar ruangan yang tersedia dengan koordinat default
+        const ROOM_TEMPLATES = [
+            { id: 'dapur', name: 'Dapur', left: 13.5, top: 39.5, room: 'Dapur' },
+            { id: 'kamar1', name: 'Kamar 1', left: 9.8, top: 49, room: 'Kamar 1' },
+            { id: 'kamar2', name: 'Kamar 2', left: 10.2, top: 56, room: 'Kamar 2' },
+            { id: 'kitchen', name: 'Kitchen', left: 16.8, top: 56.5, room: 'Kitchen' },
+            { id: 'ruang', name: 'Ruang', left: 20.5, top: 49, room: 'Ruang' },
+            { id: 'gudang', name: 'Gudang', left: 30.5, top: 49, room: 'Gudang' },
+            { id: 'family', name: 'Family', left: 25.5, top: 58, room: 'Family' },
+            { id: 'kamar3', name: 'Kamar 3', left: 30.5, top: 56.5, room: 'Kamar 3' },
+            { id: 'kamar4', name: 'Kamar 4', left: 38, top: 49, room: 'Kamar 4' },
+            { id: 'garasi', name: 'Garasi', left: 43, top: 85, room: 'Garasi' },
+            { id: 'teras', name: 'Teras', left: 27, top: 82, room: 'Teras' },
+            { id: 'kamar5', name: 'Kamar 5', left: 32, top: 73, room: 'Kamar 5' },
+            { id: 'aviary', name: 'Aviary', left: 16.5, top: 29, room: 'Aviary' },
+            { id: 'work', name: 'Work', left: 15.5, top: 25, room: 'Work' },
+            { id: 'apotek', name: 'Apotek', left: 11, top: 22, room: 'Apotek' },
+            { id: 'ekpansi', name: 'Ekpansi Green', left: 10, top: 16, room: 'Ekpansi Green' },
+            { id: 'tempat', name: 'Tempat', left: 38.5, top: 52.5, room: 'Tempat' },
+            { id: 'laundry', name: 'Laundry', left: 20, top: 40, room: 'Laundry' }
         ];
 
         // ================================================================
-        // BUILD SENSOR LIST IN SIDEBAR
+        // STATE PERANGKAT
         // ================================================================
-        const sensorListEl = document.getElementById('sensorList');
-        sensors.forEach(s => {
-            const dot = document.getElementById(s.id);
-            const coord = dot ? dot.dataset.coord || '-' : '-';
-
-            const row = document.createElement('div');
-            row.className = 'sensor-row';
-            row.id = s.id + '-row';
-            row.innerHTML = `
-                <span class="sensor-row-dot"></span>
-                <span class="sensor-row-name">${s.name}</span>
-                <span class="sensor-row-coord">${coord}</span>
-                <span class="sensor-row-status">Aman</span>
-            `;
-            sensorListEl.appendChild(row);
-        });
+        let devices = [];
+        let deviceIdCounter = 0;
+        let autoDemoInterval = null;
+        let isAutoDemo = true;
+        let logEntries = [];
+        let eventCounter = 0;
 
         // ================================================================
-        // JAM REAL-TIME DI HEADER
+        // INISIALISASI - Tambahkan 5 perangkat awal secara acak
         // ================================================================
-        function updateClock() {
-            document.getElementById('clockTime').textContent = new Date().toLocaleTimeString('id-ID');
+        function initDevices() {
+            // Pilih 5 ruangan acak sebagai perangkat awal
+            const shuffled = [...ROOM_TEMPLATES].sort(() => Math.random() - 0.5);
+            const selected = shuffled.slice(0, Math.min(5, shuffled.length));
+
+            selected.forEach((template, index) => {
+                const isActive = Math.random() > 0.7;
+                addDevice(
+                    template.id + '-' + (index + 1),
+                    template.name,
+                    template.left + (Math.random() * 2 - 1),
+                    template.top + (Math.random() * 2 - 1),
+                    template.room,
+                    isActive,
+                    false // tidak offline
+                );
+            });
+
+            updateUI();
+            addLog('Sistem', '🔌 ' + devices.length + ' perangkat terpasang', 'info');
         }
-        updateClock();
-        setInterval(updateClock, 1000);
+
+        // ================================================================
+        // FUNGSI TAMBAH PERANGKAT
+        // ================================================================
+        function addDevice(id, name, left, top, room, isActive = false, isOffline = false) {
+            const device = {
+                id: id || 'dev-' + (++deviceIdCounter),
+                name: name || 'Sensor ' + (devices.length + 1),
+                left: Math.max(0, Math.min(100, left)),
+                top: Math.max(0, Math.min(100, top)),
+                room: room || name,
+                isActive: isActive,
+                isOffline: isOffline,
+                lastMotion: isActive ? new Date() : null,
+                installedAt: new Date()
+            };
+            devices.push(device);
+            return device;
+        }
+
+        // ================================================================
+        // TAMBAH PERANGKAT BARU (dari tombol)
+        // ================================================================
+        function addRandomDevice() {
+            // Pilih ruangan yang belum terpasang
+            const installedRooms = devices.map(d => d.room);
+            const available = ROOM_TEMPLATES.filter(r => !installedRooms.includes(r.room));
+
+            if (available.length === 0) {
+                addLog('Sistem', '⚠️ Semua ruangan sudah terpasang!', 'info');
+                return;
+            }
+
+            const template = available[Math.floor(Math.random() * available.length)];
+            const isActive = Math.random() > 0.7;
+
+            const device = addDevice(
+                template.id + '-' + (devices.length + 1),
+                template.name,
+                template.left + (Math.random() * 2 - 1),
+                template.top + (Math.random() * 2 - 1),
+                template.room,
+                isActive,
+                false
+            );
+
+            addLog('Sistem', '➕ Perangkat ' + device.name + ' terpasang di ' + device.room, 'info');
+            updateUI();
+
+            // Animasi muncul
+            const dot = document.getElementById(device.id);
+            if (dot) {
+                dot.style.transform = 'translate(-50%, -50%) scale(0)';
+                setTimeout(() => {
+                    dot.style.transform = 'translate(-50%, -50%) scale(1)';
+                }, 50);
+            }
+        }
+
+        // ================================================================
+        // UPDATE VISUAL
+        // ================================================================
+        function updateUI() {
+            renderDots();
+            renderList();
+            updateCounts();
+            updateDeviceCount();
+        }
+
+        function renderDots() {
+            const container = document.getElementById('floorplan');
+
+            // Hapus semua dot lama (kecuali grid dan tombol)
+            container.querySelectorAll('.sensor-dot').forEach(el => el.remove());
+
+            devices.forEach(device => {
+                const dot = document.createElement('div');
+                dot.className = 'sensor-dot';
+                dot.id = device.id;
+
+                if (device.isOffline) {
+                    dot.classList.add('offline');
+                } else if (device.isActive) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.add('idle');
+                }
+
+                dot.style.left = device.left + '%';
+                dot.style.top = device.top + '%';
+                dot.dataset.room = device.room;
+
+                // Tooltip
+                const tooltip = document.createElement('span');
+                tooltip.className = 'sensor-tooltip';
+                tooltip.textContent = device.name + ' (' + device.room + ')';
+                dot.appendChild(tooltip);
+
+                // Koordinat
+                const coord = document.createElement('span');
+                coord.className = 'sensor-coord';
+                coord.textContent = device.left.toFixed(1) + '%, ' + device.top.toFixed(1) + '%';
+                dot.appendChild(coord);
+
+                // Click handler
+                dot.addEventListener('click', () => {
+                    toggleDevice(device.id);
+                });
+
+                container.appendChild(dot);
+            });
+        }
+
+        function renderList() {
+            const list = document.getElementById('sensorList');
+            list.innerHTML = '';
+
+            devices.forEach(device => {
+                const row = document.createElement('div');
+                row.className = 'sensor-row';
+                row.id = device.id + '-row';
+
+                if (device.isOffline) {
+                    row.classList.add('is-offline');
+                } else if (device.isActive) {
+                    row.classList.add('is-active');
+                }
+
+                const statusText = device.isOffline ? 'Offline' :
+                                   device.isActive ? 'Gerakan' : 'Aman';
+
+                row.innerHTML = `
+                    <span class="sensor-row-dot"></span>
+                    <span class="sensor-row-name">${device.name}</span>
+                    <span class="sensor-row-coord">${device.left.toFixed(1)}%, ${device.top.toFixed(1)}%</span>
+                    <span class="sensor-row-status">${statusText}</span>
+                `;
+
+                row.addEventListener('click', () => {
+                    toggleDevice(device.id);
+                });
+
+                list.appendChild(row);
+            });
+        }
+
+        function updateCounts() {
+            const active = devices.filter(d => d.isActive && !d.isOffline).length;
+            document.getElementById('activeCount').textContent = active + ' aktif';
+        }
+
+        function updateDeviceCount() {
+            document.getElementById('deviceCount').textContent = devices.length;
+        }
+
+        // ================================================================
+        // TOGGLE PERANGKAT (manual click)
+        // ================================================================
+        function toggleDevice(deviceId) {
+            const device = devices.find(d => d.id === deviceId);
+            if (!device || device.isOffline) return;
+
+            device.isActive = !device.isActive;
+            if (device.isActive) {
+                device.lastMotion = new Date();
+                addLog(device.name, '🔴 Gerakan terdeteksi!', 'motion');
+            } else {
+                addLog(device.name, '🟢 Kembali aman', 'ok');
+            }
+
+            updateUI();
+        }
+
+        // ================================================================
+        // SIMULASI GERAKAN RANDOM
+        // ================================================================
+        function simulateRandomMotion() {
+            const onlineDevices = devices.filter(d => !d.isOffline);
+            if (onlineDevices.length === 0) {
+                addLog('Sistem', '⚠️ Tidak ada perangkat online!', 'info');
+                return;
+            }
+
+            // Pilih 1-3 perangkat acak
+            const count = Math.min(Math.floor(Math.random() * 3) + 1, onlineDevices.length);
+            const shuffled = [...onlineDevices].sort(() => Math.random() - 0.5);
+            const selected = shuffled.slice(0, count);
+
+            // Reset semua ke idle dulu
+            devices.forEach(d => {
+                if (!d.isOffline) d.isActive = false;
+            });
+
+            // Aktifkan yang terpilih
+            selected.forEach(d => {
+                d.isActive = true;
+                d.lastMotion = new Date();
+                addLog(d.name, '🔴 Gerakan terdeteksi!', 'motion');
+            });
+
+            updateUI();
+        }
+
+        // ================================================================
+        // RESET SEMUA PERANGKAT
+        // ================================================================
+        function resetAllDevices() {
+            devices.forEach(d => {
+                d.isActive = false;
+                d.isOffline = false;
+            });
+            addLog('Sistem', '🔄 Semua perangkat direset', 'info');
+            updateUI();
+        }
+
+        // ================================================================
+        // AUTO DEMO - Simulasi gerakan periodik
+        // ================================================================
+        function toggleAutoDemo() {
+            isAutoDemo = !isAutoDemo;
+            document.getElementById('autoStatus').textContent = isAutoDemo ? 'ON' : 'OFF';
+
+            if (isAutoDemo) {
+                startAutoDemo();
+                addLog('Sistem', '▶️ Auto demo diaktifkan', 'info');
+            } else {
+                stopAutoDemo();
+                addLog('Sistem', '⏸️ Auto demo dinonaktifkan', 'info');
+            }
+        }
+
+        function startAutoDemo() {
+            if (autoDemoInterval) clearInterval(autoDemoInterval);
+            autoDemoInterval = setInterval(() => {
+                if (devices.length > 0 && isAutoDemo) {
+                    simulateRandomMotion();
+                }
+            }, 4000);
+        }
+
+        function stopAutoDemo() {
+            if (autoDemoInterval) {
+                clearInterval(autoDemoInterval);
+                autoDemoInterval = null;
+            }
+        }
 
         // ================================================================
         // LOG ACTIVITY
         // ================================================================
-        let logEntries = [];
-
-        function addLog(sensorName, status, isActive) {
+        function addLog(sensorName, message, type) {
             const time = new Date().toLocaleTimeString('id-ID');
-            const statusText = isActive ? '🔴 Gerakan' : '🟢 Aman';
-            const statusClass = isActive ? 'status-motion' : 'status-ok';
-
-            logEntries.unshift({ time, sensorName, statusText, statusClass, isActive });
+            const entry = { time, sensorName, message, type };
+            logEntries.unshift(entry);
             if (logEntries.length > 50) logEntries.pop();
 
-            const logArea = document.getElementById('logArea');
-            logArea.innerHTML = logEntries.map(entry =>
-                `<span class="log-entry">
-                    <span class="time">${entry.time}</span>
-                    <span class="sensor-name">${entry.sensorName}</span>
-                    <span class="${entry.statusClass}">${entry.statusText}</span>
-                </span>`
-            ).join('');
+            renderLog();
         }
 
-        // ================================================================
-        // FUNGSI UPDATE SENSOR
-        // ================================================================
-        function updateSensor(sensorId, isActive) {
-            const dot = document.getElementById(sensorId);
-            if (!dot) return;
+        function renderLog() {
+            const logArea = document.getElementById('logArea');
+            const statusClassMap = {
+                'motion': 'status-motion',
+                'ok': 'status-ok',
+                'offline': 'status-offline',
+                'info': 'status-ok'
+            };
 
-            const roomName = dot.dataset.room || sensorId;
-            const row = document.getElementById(sensorId + '-row');
-            const statusEl = row ? row.querySelector('.sensor-row-status') : null;
+            logArea.innerHTML = logEntries.map(entry => {
+                const cls = statusClassMap[entry.type] || 'status-ok';
+                return `<span class="log-entry">
+                    <span class="time">${entry.time}</span>
+                    <span class="sensor-name">${entry.sensorName}</span>
+                    <span class="${cls}">${entry.message}</span>
+                </span>`;
+            }).join('');
 
-            // Update dot
-            dot.classList.remove('idle', 'active');
-            if (isActive) {
-                dot.classList.add('active');
-                if (statusEl) statusEl.textContent = 'Gerakan';
-                if (row) row.classList.add('is-active');
-                dot.title = '🔴 Gerakan terdeteksi!';
-            } else {
-                dot.classList.add('idle');
-                if (statusEl) statusEl.textContent = 'Aman';
-                if (row) row.classList.remove('is-active');
-                dot.title = '🟢 Aman';
-            }
-
-            // Update counter
-            const activeNow = document.querySelectorAll('.sensor-dot.active').length;
-            document.getElementById('activeCount').textContent = `${activeNow} aktif`;
-
-            // Add log
-            addLog(roomName, isActive ? 'Gerakan' : 'Aman', isActive);
+            document.getElementById('logCount').textContent = logEntries.length;
         }
 
         // ================================================================
@@ -983,118 +1095,121 @@
         function toggleGrid() {
             const container = document.getElementById('floorplan');
             const btn = document.getElementById('toggleGrid');
+            gridVisible = !gridVisible;
+
             if (gridVisible) {
-                container.classList.add('grid-hidden');
-                btn.innerHTML = '<span class="icon">▦</span> Tampilkan Grid';
-                gridVisible = false;
-            } else {
                 container.classList.remove('grid-hidden');
                 btn.innerHTML = '<span class="icon">▦</span> Sembunyikan Grid';
-                gridVisible = true;
+            } else {
+                container.classList.add('grid-hidden');
+                btn.innerHTML = '<span class="icon">▦</span> Tampilkan Grid';
             }
         }
 
         // ================================================================
-        // DEMO: SIMULASI SENSOR AKTIF RANDOM
+        // JAM
         // ================================================================
-        let demoInterval = null;
-
-        function startDemo() {
-            // Set all to idle first
-            sensors.forEach(s => updateSensor(s.id, false));
-
-            demoInterval = setInterval(() => {
-                const numActive = Math.floor(Math.random() * 3) + 1;
-                const activeIds = [];
-                const shuffled = [...sensors].sort(() => Math.random() - 0.5);
-
-                for (let i = 0; i < numActive && i < shuffled.length; i++) {
-                    activeIds.push(shuffled[i].id);
-                }
-
-                sensors.forEach(s => updateSensor(s.id, false));
-                activeIds.forEach(id => updateSensor(id, true));
-
-            }, 4000);
+        function updateClock() {
+            document.getElementById('clockTime').textContent = new Date().toLocaleTimeString('id-ID');
         }
 
         // ================================================================
-        // KONEKSI WEBSOCKET KE ESP32 (siap pakai)
+        // WEBSOCKET - Siap koneksi ke ESP32
         // ================================================================
-        /*
-        const socket = new WebSocket('ws://192.168.1.100:81');
+        function connectWebSocket() {
+            // const socket = new WebSocket('ws://192.168.1.100:81');
 
-        socket.onopen = function() {
-            console.log('Terhubung ke ESP32');
-            addLog('Sistem', 'Terhubung ke ESP32', false);
-            if (demoInterval) clearInterval(demoInterval);
-        };
+            // socket.onopen = function() {
+            //     console.log('Terhubung ke ESP32');
+            //     addLog('Sistem', '🔗 Terhubung ke ESP32', 'info');
+            //     if (autoDemoInterval) stopAutoDemo();
+            // };
 
-        socket.onmessage = function(event) {
-            try {
-                const data = JSON.parse(event.data);
-                if (data.sensorId && typeof data.motion === 'boolean') {
-                    updateSensor(data.sensorId, data.motion);
-                }
-            } catch (e) {
-                console.log('Data tidak valid:', event.data);
-            }
-        };
+            // socket.onmessage = function(event) {
+            //     try {
+            //         const data = JSON.parse(event.data);
+            //         // Format: { "sensorId": "dapur", "motion": true }
+            //         // atau { "sensor-dapur": true, "sensor-ruang": false }
+            //         if (data.sensorId && typeof data.motion === 'boolean') {
+            //             const device = devices.find(d => d.id === data.sensorId || d.room === data.sensorId);
+            //             if (device) {
+            //                 device.isActive = data.motion;
+            //                 if (data.motion) {
+            //                     device.lastMotion = new Date();
+            //                     addLog(device.name, '🔴 Gerakan terdeteksi!', 'motion');
+            //                 } else {
+            //                     addLog(device.name, '🟢 Kembali aman', 'ok');
+            //                 }
+            //                 updateUI();
+            //             }
+            //         }
+            //         // Format multi-sensor
+            //         else if (typeof data === 'object') {
+            //             let hasUpdate = false;
+            //             Object.keys(data).forEach(key => {
+            //                 if (key.startsWith('sensor-')) {
+            //                     const device = devices.find(d => d.id === key || d.room === key.replace('sensor-', ''));
+            //                     if (device && typeof data[key] === 'boolean') {
+            //                         device.isActive = data[key];
+            //                         if (data[key]) {
+            //                             device.lastMotion = new Date();
+            //                             addLog(device.name, '🔴 Gerakan terdeteksi!', 'motion');
+            //                         } else {
+            //                             addLog(device.name, '🟢 Kembali aman', 'ok');
+            //                         }
+            //                         hasUpdate = true;
+            //                     }
+            //                 }
+            //             });
+            //             if (hasUpdate) updateUI();
+            //         }
+            //     } catch (e) {
+            //         console.log('Data tidak valid:', event.data);
+            //     }
+            // };
 
-        socket.onclose = function() {
-            addLog('Sistem', 'Koneksi terputus, mode demo', false);
-            startDemo();
-        };
+            // socket.onclose = function() {
+            //     addLog('Sistem', '🔌 Koneksi ESP32 terputus - mode demo', 'offline');
+            //     if (!autoDemoInterval) startAutoDemo();
+            // };
 
-        socket.onerror = function(error) {
-            console.log('WebSocket error:', error);
-            startDemo();
-        };
-        */
+            // socket.onerror = function(error) {
+            //     console.log('WebSocket error:', error);
+            // };
+        }
 
         // ================================================================
-        // MULAI DENGAN DEMO
+        // INISIALISASI
         // ================================================================
-        console.log('🏠 Dashboard Home Monitoring siap.');
-        addLog('Sistem', 'Mode Demo - simulasi sensor acak', false);
-        startDemo();
+        function init() {
+            updateClock();
+            setInterval(updateClock, 1000);
 
-        // ================================================================
-        // FUNGSI MANUAL UNTUK TESTING
-        // ================================================================
-        window.testSensor = function(sensorId, isActive) {
-            updateSensor(sensorId, isActive);
-        };
+            initDevices();
 
-        window.testAll = function(isActive) {
-            sensors.forEach(s => updateSensor(s.id, isActive));
-        };
+            // Mulai auto demo
+            startAutoDemo();
 
-        window.getSensorStatus = function() {
-            const result = {};
-            sensors.forEach(s => {
-                const dot = document.getElementById(s.id);
-                result[s.name] = dot ? dot.classList.contains('active') : false;
-            });
-            return result;
-        };
+            // Siapkan WebSocket (dikomentari)
+            // connectWebSocket();
 
-        window.showGrid = function() {
-            document.getElementById('floorplan').classList.remove('grid-hidden');
-            document.getElementById('toggleGrid').innerHTML = '<span class="icon">▦</span> Sembunyikan Grid';
-            gridVisible = true;
-        };
+            console.log('🏠 Dashboard Home Monitoring siap.');
+            console.log('📊 Jumlah perangkat: ' + devices.length);
+            console.log('💡 Klik pada dot sensor untuk toggle status');
+            console.log('💡 Gunakan tombol kontrol untuk simulasi');
 
-        window.hideGrid = function() {
-            document.getElementById('floorplan').classList.add('grid-hidden');
-            document.getElementById('toggleGrid').innerHTML = '<span class="icon">▦</span> Tampilkan Grid';
-            gridVisible = false;
-        };
+            // Ekspos fungsi ke console
+            window.devices = devices;
+            window.addDevice = addDevice;
+            window.addRandomDevice = addRandomDevice;
+            window.toggleDevice = toggleDevice;
+            window.simulateRandomMotion = simulateRandomMotion;
+            window.resetAllDevices = resetAllDevices;
+            window.getDevices = () => devices;
+        }
 
-        console.log('💡 Gunakan testSensor("sensor-dapur", true) untuk menguji sensor');
-        console.log('💡 testAll(true) untuk mengaktifkan semua, testAll(false) untuk menonaktifkan semua');
-        console.log('💡 getSensorStatus() untuk melihat status semua sensor');
-        console.log('💡 showGrid() / hideGrid() untuk toggle grid');
+        // Jalankan
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 
 </body>
