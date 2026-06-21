@@ -638,6 +638,105 @@
                 max-height: 200px;
             }
         }
+        /* ==================== MODAL TAMBAH PERANGKAT ==================== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal {
+            background: #0f1218;
+            border: 1px solid rgba(45, 212, 191, 0.25);
+            border-radius: 6px;
+            padding: 24px;
+            width: min(420px, 90vw);
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .modal-title {
+            font-family: 'Space Grotesk', sans-serif;
+            color: #c9cdd6;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-title span { color: #2dd4bf; }
+        .modal-close {
+            background: none;
+            border: none;
+            color: #5a6478;
+            font-size: 18px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+        }
+        .modal-close:hover { color: #c9cdd6; }
+        .modal-subtitle {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: #5a6478;
+            letter-spacing: 0.5px;
+        }
+        .room-picker {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            overflow-y: auto;
+            max-height: 50vh;
+            padding-right: 4px;
+        }
+        .room-picker::-webkit-scrollbar { width: 4px; }
+        .room-picker::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.08);
+            border-radius: 4px;
+        }
+        .room-option {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 4px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: #8d96aa;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        .room-option:hover {
+            background: rgba(45, 212, 191, 0.1);
+            border-color: rgba(45, 212, 191, 0.3);
+            color: #2dd4bf;
+        }
+        .room-option.installed {
+            opacity: 0.35;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .room-option .room-opt-label {
+            display: block;
+            font-size: 10px;
+            color: #3a4150;
+            margin-top: 3px;
+        }
+        .modal-hint {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            color: #3a4150;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
     </style>
 </head>
 <body>
@@ -824,13 +923,29 @@
                 <div class="panel">
                     <div class="panel-title">Kontrol Demo</div>
                     <div class="control-panel">
-                        <button class="btn btn-primary" onclick="addRandomDevice()">➕ Tambah Perangkat</button>
+                        <button class="btn btn-primary" onclick="openAddModal()">➕ Tambah Perangkat</button>
                         <button class="btn btn-success" onclick="simulateRandomMotion()">🎯 Simulasi Gerakan</button>
                         <button class="btn btn-danger" onclick="resetAllDevices()">🔄 Reset Semua</button>
                         <button class="btn" onclick="toggleAutoDemo()">⏯️ Auto: <span id="autoStatus">ON</span></button>
                     </div>
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TAMBAH PERANGKAT -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal">
+            <div class="modal-title">
+                <span>➕ Tambah <span>Perangkat</span></span>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-subtitle">Pilih ruangan untuk memasang sensor PIR</div>
+            <div class="room-picker" id="roomPicker"></div>
+            <div class="modal-hint">
+                💡 Setelah dipilih, sensor muncul di tengah denah.<br>
+                Drag sensor ke posisi yang tepat — posisi tersimpan otomatis.
             </div>
         </div>
     </div>
@@ -965,8 +1080,8 @@
             if (savedStates.length > 0) {
                 savedStates.forEach((state, index) => {
                     const template = ROOM_TEMPLATES.find(r => r.room === state.room);
-                    const baseLeft = template ? template.left : 20 + Math.random() * 20;
-                    const baseTop  = template ? template.top  : 30 + Math.random() * 30;
+                    const baseLeft = template ? template.left : 50;
+                    const baseTop  = template ? template.top  : 50;
                     addDevice(
                         (template ? template.id : state.room) + '-' + (index + 1),
                         template ? template.name : state.room,
@@ -976,31 +1091,12 @@
                         state.is_active,
                         state.is_offline
                     );
-                    // Pulihkan lastMotion
                     const dev = devices[devices.length - 1];
                     if (state.last_motion) dev.lastMotion = new Date(state.last_motion);
                 });
                 addLog('Sistem', '☁️ ' + devices.length + ' perangkat dimuat dari Supabase', 'info');
             } else {
-                // Tidak ada data tersimpan – mulai dengan 5 perangkat acak
-                const shuffled = [...ROOM_TEMPLATES].sort(() => Math.random() - 0.5);
-                const selected = shuffled.slice(0, Math.min(5, shuffled.length));
-
-                selected.forEach((template, index) => {
-                    const isActive = Math.random() > 0.7;
-                    addDevice(
-                        template.id + '-' + (index + 1),
-                        template.name,
-                        template.left + (Math.random() * 2 - 1),
-                        template.top + (Math.random() * 2 - 1),
-                        template.room,
-                        isActive,
-                        false
-                    );
-                });
-                // Simpan state awal ke Supabase
-                devices.forEach(d => saveSensorState(d));
-                addLog('Sistem', '🔌 ' + devices.length + ' perangkat terpasang (baru)', 'info');
+                addLog('Sistem', '🏠 Belum ada perangkat — klik ➕ Tambah Perangkat untuk memulai', 'info');
             }
 
             updateUI();
@@ -1033,43 +1129,71 @@
         }
 
         // ================================================================
-        // TAMBAH PERANGKAT BARU (dari tombol)
+        // MODAL TAMBAH PERANGKAT
         // ================================================================
-        function addRandomDevice() {
-            // Pilih ruangan yang belum terpasang
+        function openAddModal() {
             const installedRooms = devices.map(d => d.room);
-            const available = ROOM_TEMPLATES.filter(r => !installedRooms.includes(r.room));
+            const picker = document.getElementById('roomPicker');
+            picker.innerHTML = '';
 
-            if (available.length === 0) {
-                addLog('Sistem', '⚠️ Semua ruangan sudah terpasang!', 'info');
-                return;
-            }
+            ROOM_TEMPLATES.forEach(template => {
+                const installed = installedRooms.includes(template.room);
+                const btn = document.createElement('button');
+                btn.className = 'room-option' + (installed ? ' installed' : '');
+                btn.innerHTML = `${template.name}<span class="room-opt-label">${installed ? '✓ Terpasang' : 'Klik untuk pasang'}</span>`;
+                if (!installed) {
+                    btn.addEventListener('click', () => {
+                        addDeviceFromRoom(template);
+                        closeModal();
+                    });
+                }
+                picker.appendChild(btn);
+            });
 
-            const template = available[Math.floor(Math.random() * available.length)];
-            const isActive = Math.random() > 0.7;
+            document.getElementById('modalOverlay').classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('open');
+        }
+
+        function closeModalOnOverlay(e) {
+            if (e.target === document.getElementById('modalOverlay')) closeModal();
+        }
+
+        function addDeviceFromRoom(template) {
+            // Sensor muncul di tengah denah — user drag ke posisi asli
+            const centerLeft = 50;
+            const centerTop  = 50;
 
             const device = addDevice(
                 template.id + '-' + (devices.length + 1),
                 template.name,
-                template.left + (Math.random() * 2 - 1),
-                template.top + (Math.random() * 2 - 1),
+                centerLeft,
+                centerTop,
                 template.room,
-                isActive,
+                false,
                 false
             );
 
-            addLog('Sistem', '➕ Perangkat ' + device.name + ' terpasang di ' + device.room, 'info');
+            // Simpan state awal ke Supabase
             saveSensorState(device);
+
+            addLog('Sistem', '➕ ' + device.name + ' dipasang — drag ke posisi yang tepat', 'info');
             updateUI();
 
             // Animasi muncul
-            const dot = document.getElementById(device.id);
-            if (dot) {
-                dot.style.transform = 'translate(-50%, -50%) scale(0)';
-                setTimeout(() => {
-                    dot.style.transform = 'translate(-50%, -50%) scale(1)';
-                }, 50);
-            }
+            setTimeout(() => {
+                const dot = document.getElementById(device.id);
+                if (dot) {
+                    dot.style.transition = 'none';
+                    dot.style.transform = 'translate(-50%, -50%) scale(0)';
+                    requestAnimationFrame(() => {
+                        dot.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                        dot.style.transform = 'translate(-50%, -50%) scale(1)';
+                    });
+                }
+            }, 50);
         }
 
         // ================================================================
@@ -1482,7 +1606,7 @@
             // Ekspos fungsi ke console
             window.devices = devices;
             window.addDevice = addDevice;
-            window.addRandomDevice = addRandomDevice;
+            window.openAddModal = openAddModal;
             window.toggleDevice = toggleDevice;
             window.simulateRandomMotion = simulateRandomMotion;
             window.resetAllDevices = resetAllDevices;
