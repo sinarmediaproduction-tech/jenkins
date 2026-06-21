@@ -883,7 +883,7 @@
         async function loadAllFromSupabase() {
             try {
                 // Load posisi sensor
-                const { data: posData, error: posErr } = await supabase
+                const { data: posData, error: posErr } = await sb
                     .from('sensor_positions')
                     .select('*');
                 if (!posErr && posData) {
@@ -893,7 +893,7 @@
                 }
 
                 // Load status sensor
-                const { data: stateData, error: stateErr } = await supabase
+                const { data: stateData, error: stateErr } = await sb
                     .from('sensor_states')
                     .select('*');
                 if (!stateErr && stateData) {
