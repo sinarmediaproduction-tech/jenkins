@@ -780,6 +780,50 @@
             background: rgba(233, 69, 96, 0.14);
             border-color: rgba(233, 69, 96, 0.4);
         }
+        .btn-settings-remove.confirming {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: rgba(233, 69, 96, 0.12);
+            border-color: rgba(233, 69, 96, 0.5);
+            cursor: default;
+        }
+        .remove-confirm-text {
+            color: #fb7185;
+            font-weight: 600;
+        }
+        .remove-confirm-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .btn-confirm-yes,
+        .btn-confirm-no {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(9px, 0.7vw, 11px);
+            letter-spacing: 0.5px;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-confirm-yes {
+            background: #e94560;
+            border: 1px solid #e94560;
+            color: #fff;
+        }
+        .btn-confirm-yes:hover {
+            background: #ff5a78;
+        }
+        .btn-confirm-no {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #9aa3b5;
+        }
+        .btn-confirm-no:hover {
+            border-color: rgba(255, 255, 255, 0.35);
+            color: #d3d8e3;
+        }
 
         /* gear icon di sensor-row */
         .sensor-row-gear {
@@ -1196,7 +1240,7 @@
                     📍 Edit Lokasi
                     <span class="hint">Unlock drag — pindahkan node ke posisi baru lalu lepas untuk menyimpan</span>
                 </button>
-                <button class="btn-settings-remove" onclick="removeDevice()">
+                <button class="btn-settings-remove" id="btnRemoveDevice" onclick="confirmRemoveDeviceStep()">
                     ✕ Hapus Perangkat
                 </button>
             </div>
@@ -1421,10 +1465,12 @@
             });
 
             document.getElementById('modalOverlay').classList.add('open');
+            pauseAutoDemoForModal();
         }
 
         function closeModal() {
             document.getElementById('modalOverlay').classList.remove('open');
+            resumeAutoDemoAfterModal();
         }
 
         function closeModalOnOverlay(e) {
@@ -1522,13 +1568,17 @@
                 let dragData = null;
 
                 dot.addEventListener('pointerdown', (e) => {
+                    // outerRect = kotak floorplan TANPA transform (referensi stabil).
+                    // baseWidth/baseHeight = ukuran asli floorplanInner sebelum
+                    // di-scale (clientWidth/clientHeight tidak terpengaruh CSS transform).
                     dragData = {
                         moved: false,
                         locked: device.positionLocked,
                         startX: e.clientX,
                         startY: e.clientY,
-                        rect: container.getBoundingClientRect(),
-                        scale: parseFloat(document.getElementById('floorplanInner').style.transform.match(/scale\(([^)]+)\)/)?.[1] || 1)
+                        outerRect: document.getElementById('floorplan').getBoundingClientRect(),
+                        baseWidth: container.clientWidth,
+                        baseHeight: container.clientHeight
                     };
                     dot.setPointerCapture(e.pointerId);
                     e.preventDefault();
@@ -1546,10 +1596,18 @@
                     }
                     if (!dragData.moved) return;
 
-                    const rect = dragData.rect;
-                    const s = dragData.scale || 1;
-                    let leftPct = ((e.clientX - rect.left) / (rect.width * s)) * 100;
-                    let topPct = ((e.clientY - rect.top) / (rect.height * s)) * 100;
+                    // Ambil offset pan (ox, oy) & scale TERKINI langsung dari modul
+                    // zoom/pan, supaya tetap akurat meski denah di-pan/di-zoom lagi
+                    // saat node sedang digeser.
+                    const pan = (typeof window.__getFloorplanTransform === 'function')
+                        ? window.__getFloorplanTransform()
+                        : { ox: 0, oy: 0, scale: 1 };
+
+                    const localX = (e.clientX - dragData.outerRect.left - pan.ox);
+                    const localY = (e.clientY - dragData.outerRect.top - pan.oy);
+
+                    let leftPct = (localX / (dragData.baseWidth * pan.scale)) * 100;
+                    let topPct = (localY / (dragData.baseHeight * pan.scale)) * 100;
                     leftPct = Math.max(0, Math.min(100, leftPct));
                     topPct = Math.max(0, Math.min(100, topPct));
 
@@ -1731,6 +1789,31 @@
             }
         }
 
+        // ----------------------------------------------------------------
+        // Pause/resume auto demo otomatis saat modal (setelan / tambah
+        // perangkat) terbuka, supaya simulasi tidak berjalan diam-diam
+        // di belakang modal.
+        // ----------------------------------------------------------------
+        let modalOpenCount = 0;
+        let autoDemoPausedByModal = false;
+
+        function pauseAutoDemoForModal() {
+            modalOpenCount++;
+            if (autoDemoInterval) {
+                clearInterval(autoDemoInterval);
+                autoDemoInterval = null;
+                autoDemoPausedByModal = true;
+            }
+        }
+
+        function resumeAutoDemoAfterModal() {
+            modalOpenCount = Math.max(0, modalOpenCount - 1);
+            if (modalOpenCount === 0 && autoDemoPausedByModal) {
+                autoDemoPausedByModal = false;
+                if (isAutoDemo) startAutoDemo();
+            }
+        }
+
         // ================================================================
         // LOG ACTIVITY
         // ================================================================
@@ -1780,6 +1863,7 @@
             const device = devices.find(d => d.id === deviceId);
             if (!device) return;
             settingsDeviceId = deviceId;
+            resetRemoveButton();
 
             document.getElementById('settingsDeviceName').textContent = device.name;
 
@@ -1823,11 +1907,14 @@
             }, 0);
 
             document.getElementById('settingsModalOverlay').classList.add('open');
+            pauseAutoDemoForModal();
         }
 
         function closeSettingsModal() {
             document.getElementById('settingsModalOverlay').classList.remove('open');
             settingsDeviceId = null;
+            resetRemoveButton();
+            resumeAutoDemoAfterModal();
         }
 
         function closeSettingsOnOverlay(e) {
@@ -1877,19 +1964,61 @@
             addLog(device.name, '✏️ Mode edit lokasi aktif — drag node ke posisi baru', 'info');
         }
 
+        // ================================================================
+        // KONFIRMASI HAPUS PERANGKAT (mini confirm di tombol)
+        // ================================================================
+        let removeConfirmPending = false;
+
+        function confirmRemoveDeviceStep() {
+            const btn = document.getElementById('btnRemoveDevice');
+            if (!btn || removeConfirmPending) return;
+
+            removeConfirmPending = true;
+            btn.classList.add('confirming');
+            btn.innerHTML = `
+                <span class="remove-confirm-text">Yakin hapus?</span>
+                <span class="remove-confirm-actions">
+                    <button type="button" class="btn-confirm-yes" onclick="event.stopPropagation(); removeDevice();">Ya, Hapus</button>
+                    <button type="button" class="btn-confirm-no" onclick="event.stopPropagation(); cancelRemoveDevice();">Batal</button>
+                </span>
+            `;
+        }
+
+        function cancelRemoveDevice() {
+            resetRemoveButton();
+        }
+
+        function resetRemoveButton() {
+            removeConfirmPending = false;
+            const btn = document.getElementById('btnRemoveDevice');
+            if (btn) {
+                btn.classList.remove('confirming');
+                btn.innerHTML = '✕ Hapus Perangkat';
+            }
+        }
+
         function removeDevice() {
             if (!settingsDeviceId) return;
             const device = devices.find(d => d.id === settingsDeviceId);
             if (!device) return;
 
-            devices = devices.filter(d => d.id !== settingsDeviceId);
+            doRemoveDevice(device);
+        }
 
-            // Hapus dari Supabase
+        async function doRemoveDevice(device) {
+            // Tunggu proses hapus ke Supabase selesai dulu, baru update
+            // state lokal + DOM — supaya updateUI() dipanggil SETELAH
+            // operasi async Supabase selesai (bukan sebelum/independen).
             try {
-                sb.from('sensor_states').delete().eq('room', device.room).then(() => {});
-                sb.from('sensor_positions').delete().eq('room', device.room).then(() => {});
-            } catch(e) {}
+                await Promise.all([
+                    sb.from('sensor_states').delete().eq('room', device.room),
+                    sb.from('sensor_positions').delete().eq('room', device.room)
+                ]);
+            } catch (e) {
+                console.warn('Gagal hapus dari Supabase, lanjut hapus lokal.', e);
+            }
 
+            devices = devices.filter(d => d.id !== device.id);
             delete savedPositions[device.room];
             addLog('Sistem', '🗑️ ' + device.name + ' dihapus', 'info');
             closeSettingsModal();
@@ -2151,6 +2280,10 @@
             window.zoomIn    = () => { const c = container.clientWidth/2; zoomAt(scale + STEP, c, container.clientHeight/2); };
             window.zoomOut   = () => { const c = container.clientWidth/2; zoomAt(scale - STEP, c, container.clientHeight/2); };
             window.zoomReset = () => { scale=1; ox=0; oy=0; applyTransform(true); document.getElementById('zoomLevel').textContent='100%'; container.classList.remove('can-pan'); };
+
+            // Ekspos state pan/zoom terkini (dipakai oleh drag node di renderDots
+            // agar kalkulasi posisi % tetap akurat di semua level zoom & pan)
+            window.__getFloorplanTransform = () => ({ ox, oy, scale });
         })();
 
         // Jalankan
