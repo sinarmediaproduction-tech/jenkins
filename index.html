@@ -410,6 +410,56 @@
             opacity: 0.6;
         }
 
+        /* ==================== COLLAPSIBLE PANELS ==================== */
+        .panel-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(10px, 0.78vw, 12px);
+            color: #5a6478;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: color 0.2s;
+        }
+        .panel-toggle:hover {
+            color: #2dd4bf;
+        }
+        .panel-toggle::before {
+            content: '// ';
+            color: #2dd4bf;
+            opacity: 0.6;
+        }
+        .panel-toggle .toggle-arrow {
+            font-size: 10px;
+            transition: transform 0.25s ease;
+            color: #3a4150;
+            margin-left: auto;
+            padding-left: 8px;
+        }
+        .panel-toggle.collapsed .toggle-arrow {
+            transform: rotate(-90deg);
+        }
+        .panel-body {
+            overflow: hidden;
+            max-height: 600px;
+            transition: max-height 0.3s ease, opacity 0.25s ease, margin-top 0.25s ease;
+            opacity: 1;
+            margin-top: clamp(8px, 0.9vw, 14px);
+        }
+        .panel-body.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+        }
+
+
+
         .summary-count {
             font-family: 'Space Grotesk', sans-serif;
             color: #2dd4bf;
@@ -871,44 +921,55 @@
 
                 <!-- LEGEND -->
                 <div class="panel">
-                    <div class="panel-title">Keterangan</div>
-                    <div class="legend">
-                        <div class="legend-item">
-                            <span class="legend-color idle-color"></span>
-                            Aman (Idle)
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color active-color"></span>
-                            Gerakan Terdeteksi
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color offline-color"></span>
-                            Offline / Tidak Terpasang
+                    <button class="panel-toggle" onclick="togglePanel(this)">
+                        <span>Keterangan</span>
+                        <span class="toggle-arrow">▼</span>
+                    </button>
+                    <div class="panel-body">
+                        <div class="legend">
+                            <div class="legend-item">
+                                <span class="legend-color idle-color"></span>
+                                Aman (Idle)
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color active-color"></span>
+                                Gerakan Terdeteksi
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color offline-color"></span>
+                                Offline / Tidak Terpasang
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- LOG -->
                 <div class="panel log-panel">
-                    <div class="panel-title">
-                        Aktivitas Terakhir
-                        <span style="font-weight:normal;text-transform:none;color:#3a4150;font-family:'IBM Plex Mono',monospace;font-size:clamp(9px,0.6vw,11px);">
-                            <span id="logCount">0</span> event
-                        </span>
-                    </div>
-                    <div class="log-area" id="logArea">
-                        <span style="color:#3a4150;">🔄 Sistem siap...</span>
+                    <button class="panel-toggle" onclick="togglePanel(this)">
+                        <span>Aktivitas Terakhir</span>
+                        <span style="font-weight:normal;text-transform:none;color:#3a4150;font-family:'IBM Plex Mono',monospace;font-size:clamp(9px,0.6vw,11px);margin-left:6px;"><span id="logCount">0</span> event</span>
+                        <span class="toggle-arrow">▼</span>
+                    </button>
+                    <div class="panel-body">
+                        <div class="log-area" id="logArea">
+                            <span style="color:#3a4150;">🔄 Sistem siap...</span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- CONTROL PANEL -->
                 <div class="panel">
-                    <div class="panel-title">Kontrol Demo</div>
-                    <div class="control-panel">
-                        <button class="btn btn-primary" onclick="openAddModal()">➕ Tambah Perangkat</button>
-                        <button class="btn btn-success" onclick="simulateRandomMotion()">🎯 Simulasi Gerakan</button>
-                        <button class="btn btn-danger" onclick="resetAllDevices()">🔄 Reset Semua</button>
-                        <button class="btn" onclick="toggleAutoDemo()">⏯️ Auto: <span id="autoStatus">ON</span></button>
+                    <button class="panel-toggle collapsed" onclick="togglePanel(this)">
+                        <span>Kontrol Demo</span>
+                        <span class="toggle-arrow">▼</span>
+                    </button>
+                    <div class="panel-body collapsed">
+                        <div class="control-panel">
+                            <button class="btn btn-primary" onclick="openAddModal()">➕ Tambah Perangkat</button>
+                            <button class="btn btn-success" onclick="simulateRandomMotion()">🎯 Simulasi Gerakan</button>
+                            <button class="btn btn-danger" onclick="resetAllDevices()">🔄 Reset Semua</button>
+                            <button class="btn" onclick="toggleAutoDemo()">⏯️ Auto: <span id="autoStatus">ON</span></button>
+                        </div>
                     </div>
                 </div>
 
@@ -1469,6 +1530,16 @@
         }
 
 
+
+
+        // ================================================================
+        // TOGGLE COLLAPSIBLE PANELS
+        // ================================================================
+        function togglePanel(btn) {
+            const body = btn.nextElementSibling;
+            const collapsed = body.classList.toggle('collapsed');
+            btn.classList.toggle('collapsed', collapsed);
+        }
 
         // ================================================================
         // JAM
