@@ -835,7 +835,15 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // ================================================================
+        // SUPABASE CONFIG
+        // ================================================================
+        const SUPABASE_URL = 'https://neciaqiobajadyrkybfz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lY2lhcWlvYmFqYWR5cmt5YmZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5ODgyMTcsImV4cCI6MjA5NzU2NDIxN30.MECkNuEoBZ0dkjEaZA7Fj_eIWJZDMKTP7gM9eDLRQhs';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         // ================================================================
         // DATA SENSOR - Ini adalah "database" perangkat yang terpasang
         // Setiap perangkat memiliki koordinat grid (left%, top%)
@@ -864,35 +872,80 @@
         ];
 
         // ================================================================
-        // PENYIMPANAN POSISI LOKAL
-        // Posisi sensor yang sudah digeser disimpan di localStorage browser,
-        // dikunci berdasarkan NAMA RUANGAN (bukan id), karena id perangkat
-        // berubah-ubah setiap kali 5 sensor acak dipilih ulang saat halaman
-        // dimuat. Selama dibuka dari browser/perangkat yang sama, posisi
-        // akan tetap nempel walau halaman di-refresh atau ditutup-buka lagi.
+        // PENYIMPANAN KE SUPABASE
+        // Posisi, status, dan log disimpan ke Supabase agar persisten
+        // di semua perangkat dan browser.
         // ================================================================
-        const POSITION_STORAGE_KEY = 'homeMonitor.sensorPositions';
 
-        function loadSavedPositions() {
+        // Cache posisi di memori (diisi saat init dari Supabase)
+        let savedPositions = {};
+
+        async function loadAllFromSupabase() {
             try {
-                const raw = localStorage.getItem(POSITION_STORAGE_KEY);
-                return raw ? JSON.parse(raw) : {};
+                // Load posisi sensor
+                const { data: posData, error: posErr } = await supabase
+                    .from('sensor_positions')
+                    .select('*');
+                if (!posErr && posData) {
+                    posData.forEach(row => {
+                        savedPositions[row.room] = { left: row.left_pct, top: row.top_pct };
+                    });
+                }
+
+                // Load status sensor
+                const { data: stateData, error: stateErr } = await supabase
+                    .from('sensor_states')
+                    .select('*');
+                if (!stateErr && stateData) {
+                    return stateData; // dikembalikan untuk dipakai initDevices
+                }
             } catch (e) {
-                console.warn('Local storage tidak tersedia, posisi sensor tidak akan disimpan.', e);
-                return {};
+                console.warn('Gagal load dari Supabase, pakai default.', e);
             }
+            return [];
         }
 
-        function saveSensorPosition(room, left, top) {
+        async function saveSensorPosition(room, left, top) {
             savedPositions[room] = { left, top };
             try {
-                localStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(savedPositions));
+                await supabase.from('sensor_positions').upsert(
+                    { room, left_pct: left, top_pct: top, updated_at: new Date().toISOString() },
+                    { onConflict: 'room' }
+                );
             } catch (e) {
-                console.warn('Gagal menyimpan posisi sensor ke local storage.', e);
+                console.warn('Gagal simpan posisi ke Supabase.', e);
             }
         }
 
-        let savedPositions = loadSavedPositions();
+        async function saveSensorState(device) {
+            try {
+                await supabase.from('sensor_states').upsert(
+                    {
+                        room: device.room,
+                        is_active: device.isActive,
+                        is_offline: device.isOffline,
+                        last_motion: device.lastMotion ? device.lastMotion.toISOString() : null,
+                        updated_at: new Date().toISOString()
+                    },
+                    { onConflict: 'room' }
+                );
+            } catch (e) {
+                console.warn('Gagal simpan status sensor ke Supabase.', e);
+            }
+        }
+
+        async function saveLog(sensorName, message, type) {
+            try {
+                await supabase.from('sensor_logs').insert({
+                    sensor_name: sensorName,
+                    message: message,
+                    type: type,
+                    created_at: new Date().toISOString()
+                });
+            } catch (e) {
+                console.warn('Gagal simpan log ke Supabase.', e);
+            }
+        }
 
         // ================================================================
         // STATE PERANGKAT
@@ -907,26 +960,50 @@
         // ================================================================
         // INISIALISASI - Tambahkan 5 perangkat awal secara acak
         // ================================================================
-        function initDevices() {
-            // Pilih 5 ruangan acak sebagai perangkat awal
-            const shuffled = [...ROOM_TEMPLATES].sort(() => Math.random() - 0.5);
-            const selected = shuffled.slice(0, Math.min(5, shuffled.length));
+        function initDevices(savedStates = []) {
+            // Jika ada status tersimpan di Supabase, muat ruangan dari sana
+            if (savedStates.length > 0) {
+                savedStates.forEach((state, index) => {
+                    const template = ROOM_TEMPLATES.find(r => r.room === state.room);
+                    const baseLeft = template ? template.left : 20 + Math.random() * 20;
+                    const baseTop  = template ? template.top  : 30 + Math.random() * 30;
+                    addDevice(
+                        (template ? template.id : state.room) + '-' + (index + 1),
+                        template ? template.name : state.room,
+                        baseLeft,
+                        baseTop,
+                        state.room,
+                        state.is_active,
+                        state.is_offline
+                    );
+                    // Pulihkan lastMotion
+                    const dev = devices[devices.length - 1];
+                    if (state.last_motion) dev.lastMotion = new Date(state.last_motion);
+                });
+                addLog('Sistem', '☁️ ' + devices.length + ' perangkat dimuat dari Supabase', 'info');
+            } else {
+                // Tidak ada data tersimpan – mulai dengan 5 perangkat acak
+                const shuffled = [...ROOM_TEMPLATES].sort(() => Math.random() - 0.5);
+                const selected = shuffled.slice(0, Math.min(5, shuffled.length));
 
-            selected.forEach((template, index) => {
-                const isActive = Math.random() > 0.7;
-                addDevice(
-                    template.id + '-' + (index + 1),
-                    template.name,
-                    template.left + (Math.random() * 2 - 1),
-                    template.top + (Math.random() * 2 - 1),
-                    template.room,
-                    isActive,
-                    false // tidak offline
-                );
-            });
+                selected.forEach((template, index) => {
+                    const isActive = Math.random() > 0.7;
+                    addDevice(
+                        template.id + '-' + (index + 1),
+                        template.name,
+                        template.left + (Math.random() * 2 - 1),
+                        template.top + (Math.random() * 2 - 1),
+                        template.room,
+                        isActive,
+                        false
+                    );
+                });
+                // Simpan state awal ke Supabase
+                devices.forEach(d => saveSensorState(d));
+                addLog('Sistem', '🔌 ' + devices.length + ' perangkat terpasang (baru)', 'info');
+            }
 
             updateUI();
-            addLog('Sistem', '🔌 ' + devices.length + ' perangkat terpasang', 'info');
         }
 
         // ================================================================
@@ -982,6 +1059,7 @@
             );
 
             addLog('Sistem', '➕ Perangkat ' + device.name + ' terpasang di ' + device.room, 'info');
+            saveSensorState(device);
             updateUI();
 
             // Animasi muncul
@@ -1164,6 +1242,9 @@
                 addLog(device.name, '🟢 Kembali aman', 'ok');
             }
 
+            // Simpan status ke Supabase
+            saveSensorState(device);
+
             updateUI();
         }
 
@@ -1194,6 +1275,9 @@
                 addLog(d.name, '🔴 Gerakan terdeteksi!', 'motion');
             });
 
+            // Simpan semua status ke Supabase
+            devices.forEach(d => saveSensorState(d));
+
             updateUI();
         }
 
@@ -1204,6 +1288,7 @@
             devices.forEach(d => {
                 d.isActive = false;
                 d.isOffline = false;
+                saveSensorState(d);
             });
             addLog('Sistem', '🔄 Semua perangkat direset', 'info');
             updateUI();
@@ -1251,6 +1336,9 @@
             if (logEntries.length > 50) logEntries.pop();
 
             renderLog();
+
+            // Simpan log ke Supabase (async, tidak blokir UI)
+            saveLog(sensorName, message, type);
         }
 
         function renderLog() {
@@ -1368,11 +1456,17 @@
         // ================================================================
         // INISIALISASI
         // ================================================================
-        function init() {
+        async function init() {
             updateClock();
             setInterval(updateClock, 1000);
 
-            initDevices();
+            // Tampilkan indikator loading
+            addLog('Sistem', '⏳ Memuat data dari Supabase...', 'info');
+
+            // Load posisi & status dari Supabase terlebih dahulu
+            const savedStates = await loadAllFromSupabase();
+
+            initDevices(savedStates);
 
             // Mulai auto demo
             startAutoDemo();
@@ -1380,7 +1474,7 @@
             // Siapkan WebSocket (dikomentari)
             // connectWebSocket();
 
-            console.log('🏠 Dashboard Home Monitoring siap.');
+            console.log('🏠 Dashboard Home Monitoring siap (Supabase aktif).');
             console.log('📊 Jumlah perangkat: ' + devices.length);
             console.log('💡 Klik pada dot sensor untuk toggle status');
             console.log('💡 Gunakan tombol kontrol untuk simulasi');
