@@ -842,7 +842,7 @@
         // ================================================================
         const SUPABASE_URL = 'https://neciaqiobajadyrkybfz.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lY2lhcWlvYmFqYWR5cmt5YmZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5ODgyMTcsImV4cCI6MjA5NzU2NDIxN30.MECkNuEoBZ0dkjEaZA7Fj_eIWJZDMKTP7gM9eDLRQhs';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ================================================================
         // DATA SENSOR - Ini adalah "database" perangkat yang terpasang
@@ -908,7 +908,7 @@
         async function saveSensorPosition(room, left, top) {
             savedPositions[room] = { left, top };
             try {
-                await supabase.from('sensor_positions').upsert(
+                await sb.from('sensor_positions').upsert(
                     { room, left_pct: left, top_pct: top, updated_at: new Date().toISOString() },
                     { onConflict: 'room' }
                 );
@@ -919,7 +919,7 @@
 
         async function saveSensorState(device) {
             try {
-                await supabase.from('sensor_states').upsert(
+                await sb.from('sensor_states').upsert(
                     {
                         room: device.room,
                         is_active: device.isActive,
@@ -936,7 +936,7 @@
 
         async function saveLog(sensorName, message, type) {
             try {
-                await supabase.from('sensor_logs').insert({
+                await sb.from('sensor_logs').insert({
                     sensor_name: sensorName,
                     message: message,
                     type: type,
