@@ -864,6 +864,37 @@
         ];
 
         // ================================================================
+        // PENYIMPANAN POSISI LOKAL
+        // Posisi sensor yang sudah digeser disimpan di localStorage browser,
+        // dikunci berdasarkan NAMA RUANGAN (bukan id), karena id perangkat
+        // berubah-ubah setiap kali 5 sensor acak dipilih ulang saat halaman
+        // dimuat. Selama dibuka dari browser/perangkat yang sama, posisi
+        // akan tetap nempel walau halaman di-refresh atau ditutup-buka lagi.
+        // ================================================================
+        const POSITION_STORAGE_KEY = 'homeMonitor.sensorPositions';
+
+        function loadSavedPositions() {
+            try {
+                const raw = localStorage.getItem(POSITION_STORAGE_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch (e) {
+                console.warn('Local storage tidak tersedia, posisi sensor tidak akan disimpan.', e);
+                return {};
+            }
+        }
+
+        function saveSensorPosition(room, left, top) {
+            savedPositions[room] = { left, top };
+            try {
+                localStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(savedPositions));
+            } catch (e) {
+                console.warn('Gagal menyimpan posisi sensor ke local storage.', e);
+            }
+        }
+
+        let savedPositions = loadSavedPositions();
+
+        // ================================================================
         // STATE PERANGKAT
         // ================================================================
         let devices = [];
@@ -902,12 +933,19 @@
         // FUNGSI TAMBAH PERANGKAT
         // ================================================================
         function addDevice(id, name, left, top, room, isActive = false, isOffline = false) {
+            const finalRoom = room || name;
+            // Jika ruangan ini pernah punya posisi yang disimpan (hasil drag
+            // sebelumnya), pakai posisi tersimpan itu, bukan posisi default/acak
+            const saved = savedPositions[finalRoom];
+            const finalLeft = saved ? saved.left : left;
+            const finalTop = saved ? saved.top : top;
+
             const device = {
                 id: id || 'dev-' + (++deviceIdCounter),
                 name: name || 'Sensor ' + (devices.length + 1),
-                left: Math.max(0, Math.min(100, left)),
-                top: Math.max(0, Math.min(100, top)),
-                room: room || name,
+                left: Math.max(0, Math.min(100, finalLeft)),
+                top: Math.max(0, Math.min(100, finalTop)),
+                room: finalRoom,
                 isActive: isActive,
                 isOffline: isOffline,
                 lastMotion: isActive ? new Date() : null,
@@ -1051,7 +1089,8 @@
                     dot.classList.remove('dragging');
 
                     if (dragData.moved) {
-                        addLog(device.name, '📍 Posisi diperbarui (' + device.left.toFixed(1) + '%, ' + device.top.toFixed(1) + '%)', 'info');
+                        saveSensorPosition(device.room, device.left, device.top);
+                        addLog(device.name, '📍 Posisi disimpan (' + device.left.toFixed(1) + '%, ' + device.top.toFixed(1) + '%)', 'info');
                         renderList();
                     } else {
                         toggleDevice(device.id);
