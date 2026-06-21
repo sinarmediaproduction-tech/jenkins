@@ -307,6 +307,12 @@
             padding: 1px 4px;
             border-radius: 2px;
             white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .sensor-dot:hover .sensor-coord {
+            opacity: 1;
         }
 
         .sensor-dot.idle .sensor-core {
