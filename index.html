@@ -761,6 +761,43 @@
             0%, 100% { transform: translate(-50%, -50%) rotate(45deg) scale(1); }
             50% { transform: translate(-50%, -50%) rotate(45deg) scale(1.18); }
         }
+
+        /* edit nama */
+        .settings-name-wrap {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .settings-name-input {
+            flex: 1;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(45, 212, 191, 0.25);
+            border-radius: 3px;
+            padding: 6px 10px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(10px, 0.75vw, 12px);
+            color: #c9cdd6;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .settings-name-input:focus {
+            border-color: rgba(45, 212, 191, 0.6);
+        }
+        .btn-save-name {
+            background: rgba(45, 212, 191, 0.1);
+            border: 1px solid rgba(45, 212, 191, 0.3);
+            color: #2dd4bf;
+            padding: 6px 12px;
+            border-radius: 3px;
+            font-size: clamp(10px, 0.75vw, 12px);
+            cursor: pointer;
+            font-family: 'IBM Plex Mono', monospace;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-save-name:hover {
+            background: rgba(45, 212, 191, 0.2);
+        }
         /* ==================== RESPONSIVE ==================== */
         @media (max-width: 900px) {
             .main-content {
@@ -1689,6 +1726,13 @@
 
             document.getElementById('settingsInfo').innerHTML = `
                 <div class="settings-row">
+                    <span class="settings-label">Nama</span>
+                    <div class="settings-name-wrap">
+                        <input class="settings-name-input" id="settingsNameInput" value="${device.name}" maxlength="32" />
+                        <button class="btn-save-name" onclick="saveName()">Simpan</button>
+                    </div>
+                </div>
+                <div class="settings-row">
                     <span class="settings-label">Ruangan</span>
                     <span class="settings-val">${device.room}</span>
                 </div>
@@ -1705,6 +1749,11 @@
                     ${lockedText}
                 </div>
             `;
+            // Simpan nama saat Enter
+            setTimeout(() => {
+                const inp = document.getElementById('settingsNameInput');
+                if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') saveName(); });
+            }, 0);
 
             document.getElementById('settingsModalOverlay').classList.add('open');
         }
@@ -1716,6 +1765,33 @@
 
         function closeSettingsOnOverlay(e) {
             if (e.target === document.getElementById('settingsModalOverlay')) closeSettingsModal();
+        }
+
+        function saveName() {
+            const device = devices.find(d => d.id === settingsDeviceId);
+            if (!device) return;
+            const inp = document.getElementById('settingsNameInput');
+            const newName = inp ? inp.value.trim() : '';
+            if (!newName || newName === device.name) return;
+
+            const oldName = device.name;
+            device.name = newName;
+
+            // Update tooltip di dot
+            const dot = document.getElementById(device.id);
+            if (dot) {
+                const tooltip = dot.querySelector('.sensor-tooltip');
+                if (tooltip) tooltip.textContent = newName + ' (' + device.room + ')';
+            }
+
+            // Update header modal
+            document.getElementById('settingsDeviceName').textContent = newName;
+
+            // Simpan ke Supabase
+            saveSensorState(device);
+
+            addLog(oldName, '✏️ Nama diubah → ' + newName, 'info');
+            renderList();
         }
 
         function startEditLocation() {
