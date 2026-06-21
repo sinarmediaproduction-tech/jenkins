@@ -1688,19 +1688,22 @@
             if (!device || device.isOffline) return;
 
             device.isActive = !device.isActive;
+            const toastMsg  = device.isActive ? '⚠ Gerakan terdeteksi!' : '✓ Kembali aman';
+            const toastType = device.isActive ? 'motion' : 'ok';
+
             if (device.isActive) {
                 device.lastMotion = new Date();
                 addLog(device.name, '🔴 Gerakan terdeteksi!', 'motion');
-                showNodeToast(device.id, '⚠ Gerakan terdeteksi!', 'motion');
             } else {
                 addLog(device.name, '🟢 Kembali aman', 'ok');
-                showNodeToast(device.id, '✓ Kembali aman', 'ok');
             }
 
             // Simpan status ke Supabase
             saveSensorState(device);
 
+            // updateUI rebuild dots — toast harus dipanggil SETELAH itu
             updateUI();
+            showNodeToast(device.id, toastMsg, toastType);
         }
 
         // ================================================================
@@ -1728,13 +1731,14 @@
                 d.isActive = true;
                 d.lastMotion = new Date();
                 addLog(d.name, '🔴 Gerakan terdeteksi!', 'motion');
-                showNodeToast(d.id, '⚠ Gerakan terdeteksi!', 'motion');
             });
 
             // Simpan semua status ke Supabase
             devices.forEach(d => saveSensorState(d));
 
+            // updateUI rebuild dots — toast dipanggil SETELAH render selesai
             updateUI();
+            selected.forEach(d => showNodeToast(d.id, '⚠ Gerakan terdeteksi!', 'motion'));
         }
 
         // ================================================================
