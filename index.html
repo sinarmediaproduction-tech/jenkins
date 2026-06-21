@@ -222,9 +222,22 @@
             background: #11241b;
             border: 2px solid rgba(74, 222, 128, 0.25);
             transform: translate(-50%, -50%);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s, border-color 0.3s, box-shadow 0.3s;
+            cursor: grab;
+            touch-action: none;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .sensor-dot.dragging {
+            cursor: grabbing;
+            z-index: 50;
+            transform: translate(-50%, -50%) scale(1.2);
+            border-color: rgba(45, 212, 191, 0.8);
+            box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.15), 0 0 25px rgba(45, 212, 191, 0.5);
+        }
+        .sensor-dot.dragging .sensor-tooltip {
+            opacity: 1;
+            bottom: calc(100% + 16px);
         }
 
         .sensor-dot::before {
@@ -955,9 +968,62 @@
                 coord.textContent = device.left.toFixed(1) + '%, ' + device.top.toFixed(1) + '%';
                 dot.appendChild(coord);
 
-                // Click handler
-                dot.addEventListener('click', () => {
-                    toggleDevice(device.id);
+                // Geser (drag) untuk mengatur posisi sensor sesuai lokasi pemasangan asli.
+                // Klik singkat tanpa menggeser tetap men-toggle status seperti biasa.
+                let dragData = null;
+
+                dot.addEventListener('pointerdown', (e) => {
+                    dragData = {
+                        moved: false,
+                        startX: e.clientX,
+                        startY: e.clientY,
+                        rect: container.getBoundingClientRect()
+                    };
+                    dot.setPointerCapture(e.pointerId);
+                    e.preventDefault();
+                });
+
+                dot.addEventListener('pointermove', (e) => {
+                    if (!dragData) return;
+
+                    const dx = e.clientX - dragData.startX;
+                    const dy = e.clientY - dragData.startY;
+                    if (!dragData.moved && Math.hypot(dx, dy) > 4) {
+                        dragData.moved = true;
+                        dot.classList.add('dragging');
+                    }
+                    if (!dragData.moved) return;
+
+                    const rect = dragData.rect;
+                    let leftPct = ((e.clientX - rect.left) / rect.width) * 100;
+                    let topPct = ((e.clientY - rect.top) / rect.height) * 100;
+                    leftPct = Math.max(0, Math.min(100, leftPct));
+                    topPct = Math.max(0, Math.min(100, topPct));
+
+                    device.left = leftPct;
+                    device.top = topPct;
+                    dot.style.left = leftPct + '%';
+                    dot.style.top = topPct + '%';
+                    coord.textContent = leftPct.toFixed(1) + '%, ' + topPct.toFixed(1) + '%';
+                });
+
+                dot.addEventListener('pointerup', (e) => {
+                    if (!dragData) return;
+                    dot.releasePointerCapture(e.pointerId);
+                    dot.classList.remove('dragging');
+
+                    if (dragData.moved) {
+                        addLog(device.name, '📍 Posisi diperbarui (' + device.left.toFixed(1) + '%, ' + device.top.toFixed(1) + '%)', 'info');
+                        renderList();
+                    } else {
+                        toggleDevice(device.id);
+                    }
+                    dragData = null;
+                });
+
+                dot.addEventListener('pointercancel', () => {
+                    dragData = null;
+                    dot.classList.remove('dragging');
                 });
 
                 container.appendChild(dot);
